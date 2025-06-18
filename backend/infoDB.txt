@@ -1,0 +1,19 @@
+Instal·lacions:
+	npm install express mariadb
+	npm install --save-dev nodemon
+	
+
+
+
+Mirar databases: 
+mysql> show databases;
+
+entrar a la base de dades:
+mysql> \u cavalls_db
+
+Mirar taules dins de la base de dades:
+mysql> show tables;
+
+Per accedir: mysql -u cavalls -p -h localhost -D cavalls_db
+
+

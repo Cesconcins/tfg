@@ -1,0 +1,63 @@
+
+/* Header */
+.site-header            { background:#1f2937; color:#fff; }
+.site-header .wrapper   { max-width:72rem; margin:0 auto; padding:1rem 1rem;
+                          display:flex; align-items:center; justify-content:space-between; }
+.site-header .brand     { font-size:1.25rem; font-weight:700; }
+.main-nav ul            { list-style:none; display:flex; gap:1.5rem; margin:0; padding:0; }
+.main-nav a             { color:#fff; text-decoration:none; }
+.main-nav a:hover       { text-decoration:underline; }
+
+/* Footer */
+.site-footer            { background:#111827; color:#fff; margin-top:2rem; }
+.site-footer .wrapper   { max-width:72rem; margin:0 auto; padding:1.5rem 1rem; text-align:center; }
+
+/* Cos de la pàgina */
+body                    { font-family:system-ui, sans-serif; margin:0; min-height:100vh;
+                          display:flex; flex-direction:column; }
+main                    { flex-grow:1; }
+h2                      { margin-top:0; }
+
+
+/* Botons reutilitzables */
+.btn-primary            { background:#2563eb; color:#fff; border:none; padding:0.5rem 1rem; cursor:pointer; }
+.btn-secondary          { background:#e5e7eb; color:#111; border:none; padding:0.5rem 1rem; cursor:pointer; }
+.btn-primary:hover      { background:#1e40af; }
+.btn-secondary:hover    { background:#d1d5db; }
+
+/* Modal genèric */
+.modal                  { position:fixed; inset:0; background:rgba(0,0,0,0.6); display:flex;
+                          align-items:center; justify-content:center; z-index:1000; }
+.modal.hidden           { display:none; }
+.modal-content          { background:#fff; padding:2rem; width:100%; max-width:28rem; border-radius:0.5rem; }
+.modal-title            { margin-top:0; margin-bottom:1rem; }
+.modal-content label    { display:block; margin-bottom:0.75rem; }
+.modal-content input    { width:100%; padding:0.4rem; margin-top:0.25rem; }
+.modal-actions          { display:flex; justify-content:flex-end; gap:0.5rem; margin-top:1rem; }
+.row                    { display:flex; align-items:center; gap:0.5rem; }
+
+.link-button            { background: none; border: none; padding: 0; margin: 0; font: inherit; color: inherit; text-decoration: none; cursor: pointer; }
+.link-button:hover      { text-decoration: underline; }
+
+.map-container          { height: 100vh; width: 100%; flex-grow: 2; }
+  
+.map                    { height: 100%; }
+
+.wrapper                { max-width: 72rem; margin: 0 auto; }
+
+#toggle-view-btn {
+    position: fixed;
+    bottom: 1rem;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 1001;         /* per sobre del mapa i anuncis */
+    background: none;      /* sense fons */
+    border: none;          /* sense contorn */
+    font: inherit;
+    color: inherit;
+    padding: 0.5rem 1rem;
+    cursor: pointer;
+  }
+#toggle-view-btn:hover {
+    text-decoration: underline;
+}
