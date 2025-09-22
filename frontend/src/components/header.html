@@ -1,17 +1,17 @@
 <header class="site-header">
     <div class="wrapper">
-        <h1 class="brand">Plataforma Cavalls</h1>
+        <h1 class="brand">Plataforma Caballos</h1>
   
         <nav class="main-nav">
             <ul>
-                <li><a href="/public/index.html">Inici</a></li>
-                <li><a href="/src/pages/anuncis.html">Anuncis</a></li>
-                <button id="btn-open-login" class="link-button">
-                    Login
-                </button>
-                <button id="btn-open-register" class="link-button">
-                    Register
-                </button>
+                <li><a href="/public/index.html">Inicio</a></li>
+                <li><a href="/src/pages/anuncis.html">Anuncios</a></li>
+                <li id="nav-login"><a class="link-button" href="/src/pages/login.html">Login</a></li> <!-- id per poder amagar la opció un cop l'usuari s'ha registat -->
+                <li id="nav-register"><a class="link-button" href="/src/pages/register.html">Register</a></li> <!-- igual que el login -->
+
+                <li id="nav-perfil" class="hidden"><a href="/src/pages/perfil.html">Perfil</a></li>
+                <li id="nav-admin"  class="hidden"><a href="/src/pages/admin.html">Admin</a></li>
+                <li id="nav-logout" class="hidden"><button class="link-button" id="btn-logout">Log Out</button></li>
             </ul>
   
         </nav>

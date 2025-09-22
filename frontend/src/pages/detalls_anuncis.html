@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="ca">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Detalles del anuncio</title>
+
+    <link rel="stylesheet" href="/../assets/index.css" />
+    <link rel="stylesheet" href="https://api.mapbox.com/mapbox-gl-js/v2.13.0/mapbox-gl.css" />
+</head>
+<body>
+    <header></header>
+
+    <main class="wrapper" style="padding:1.25rem 1rem;">
+        <a href="/../../public/uploads/anuncis.html" class="link-button">← Tornar als anuncis</a>
+
+        <section id="detall" class="detall-wrap" style="margin-top:1rem;"> </section>
+
+        <template id="detall-template">
+            <div class="gallery">
+                <img class="detall-img" src="/uploads/cavall_prova.jpg" alt="" />
+            </div>
+
+            <div class="info-block">
+                <h1 class="detall-titol">
+                    <span class="detall-nom"></span>
+                    <span class="badgetop hidden">🏅 Destacado</span>
+                </h1>
+
+                <p class="price detall-preu"></p>
+                <p class="detall-desc"></p>
+
+                <h3>Características</h3>
+                <div class="info-grid">
+                    <div><strong>Raza:</strong> <span class="detall-raca"></span></div>
+                    <div><strong>Edad:</strong> <span class="detall-edat"></span></div>
+                    <div><strong>Altura:</strong> <span class="detall-alcada"></span></div>
+                    <div><strong>Peso:</strong> <span class="detall-pes"></span></div>
+                    <div><strong>Sexo:</strong> <span class="detall-sexe"></span></div>
+                    <div><strong>Ubicacion:</strong> <span class="detall-ubicacio"></span></div>
+                </div>
+
+                <h3 style="margin-top:1rem;">Disciplinas</h3>
+                <div class="tags detall-disciplines"></div>
+
+                <h3 style="margin-top:1rem;">Mapa</h3>
+                <div id="map-detall"></div>
+            </div>
+        </template>
+    </main>
+
+    <footer></footer>
+
+    <script src="/../scripts/afegir_components.js" defer></script>
+    <script src="https://api.mapbox.com/mapbox-gl-js/v2.13.0/mapbox-gl.js" defer></script>
+    <script src="/../scripts/detalls_anuncis.js" defer></script>
+
+    <script src="/src/scripts/auth_ui.js"></script>
+</body>
+</html>

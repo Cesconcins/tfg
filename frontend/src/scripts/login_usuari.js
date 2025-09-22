@@ -1,38 +1,34 @@
 document.addEventListener('DOMContentLoaded', () => {
-    const modal    = document.getElementById('login-modal');
-    const form     = document.getElementById('login-form');
+    const form  = document.getElementById('login-form');
+    if (!form) return; // No és la pàgina de login
 
-    document.addEventListener('click', (e) => {
-    if (e.target.matches('#btn-open-login')) {
-        modal.classList.remove('hidden');
-    }
-    if (e.target.matches('#btn-close-login')) {
-        modal.classList.add('hidden');
-    }
-    });
+    const errorBox = document.getElementById('login-error');
 
     form.addEventListener('submit', async (e) => {
         e.preventDefault();
-
+        errorBox.style.display = 'none';
         const data = Object.fromEntries(new FormData(form).entries());
-        data.administrador = !!data.administrador;
 
         try {
             const res = await fetch('http://localhost:3001/usuaris/login', {
                 method: 'POST',
                 headers: { 'Content-Type':'application/json' },
+                credentials: 'include',
                 body: JSON.stringify(data)
             });
-            if (!res.ok) throw new Error('Error al servidor');
+            if (!res.ok) throw new Error('Credenciales incorrectas o error al servidor');
 
             const usuari = await res.json();
-            alert(`Benvingut/da, ${usuari.nom}!`);
-            form.reset();
-            modal.classList.add('hidden');
-        }
-        catch (err) {
+
+            // “Sessió” simple: guarda usuari (sense seguretat)
+            localStorage.setItem('sessio_usuari', JSON.stringify(usuari));
+
+            // Redirigeix inici
+            window.location.href = '/public/index.html';
+        } catch (err) {
             console.error(err);
-            alert('No s’ha pogut iniciar sessió');
+            errorBox.textContent = 'No ha sido posible iniciar sessión. Revisa las credenciales.';
+            errorBox.style.display = 'block';
         }
     });
 });

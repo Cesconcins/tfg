@@ -3,7 +3,7 @@
     <head>
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>Plataforma Cavalls · Inici</title>
+        <title>Plataforma Caballos · Mapa</title>
 
         <link rel="stylesheet" href="../src/assets/index.css" />
         <link rel="stylesheet" href="https://api.mapbox.com/mapbox-gl-js/v2.13.0/mapbox-gl.css" />
@@ -13,70 +13,29 @@
         <header></header>
 
         <main>
-            <div id="register-modal" class="modal hidden">
-                <div class="modal-content">
-                    <h3 class="modal-title">Registrar usuari</h3>
-                
-                    <form id="register-form">
-                        <label>Nom
-                            <input name="nom" required />
-                        </label>
-                
-                        <label>Cognom
-                            <input name="cognom" required />
-                        </label>
-                
-                        <label>Correu electrònic
-                            <input name="correu_electronic" type="email" required />
-                        </label>
-                
-                        <label>Contrassenya
-                            <input name="contrassenya" type="password" required />
-                        </label>
-                
-                        <div class="modal-actions">
-                            <button type="button" id="btn-close-register" class="btn-secondary">Cancel·la</button>
-                            <button type="submit" class="btn-primary">Donar d'alta</button>
-                        </div>
-                    </form>
-                </div>
-            </div>
-
-            <div id="login-modal" class="modal hidden">
-                <div class="modal-content">
-                    <h3 class="modal-title">Iniciar sessió</h3>
-
-                    <form id="login-form">
-                        <label>Correu electrònic
-                            <input name="correu_electronic" type="email" required />
-                        </label>
-
-                        <label>Contrassenya
-                            <input name="contrassenya" type="password" required />
-                        </label>
-
-                        <div class="modal-actions">
-                            <button type="button" id="btn-close-login" class="btn-secondary">Cancel·la</button>
-                            <button type="submit" class="btn-primary">Entrar</button>
-                        </div>
-                    </form>
-                </div>
-            </div>
-
-            <button id="toggle-view-btn" class="link-button">Anuncis</button>
-
-            <section id="ads-section" class="hidden wrapper" style="padding:2rem 1rem;">
-                <h2>Anuncis disponibles</h2>
-                <ul id="ads-list">
-                    <li>Cavall 1: Raça X, Preu 1000€</li>
-                    <li>Cavall 2: Raça Y, Preu 2000€</li>
-                </ul>
-            </section>
+            <template id="card-template">
+                <article class="card-anunci">
+                    <div class="card-img">
+                        <img src="/cavall_prova.jpg" alt="" />
+                        <span class="badge hidden">🏅 Destacado</span>
+                    </div>
+                    <div class="card-body">
+                        <h3 class="card-nom"></h3>
+                        <p class="sub card-sub"></p>
+                        <p class="price card-price"></p>
+                        <div class="tags card-tags"></div>
+                        <p class="desc card-desc"></p>
+                        <a href="" class="btn-detail">Veure</a>
+                    </div>
+                </article>
+            </template>
         </main>
-        <div id="map-section" class="map-container">
-            <div id="map"></div>
-        </div>
 
+        <div class="map-sidebar">
+            <div id="map" class="map-container"></div>
+            <aside id="sidebar" class="sidebar"></aside>
+        </div>
+        
         <footer></footer>
 
         <script src="../src/scripts/afegir_components.js"></script>
@@ -86,5 +45,7 @@
         <script src="/src/scripts/canvi_vistes.js"></script>
         <script src="https://api.mapbox.com/mapbox-gl-js/v2.13.0/mapbox-gl.js"></script>
         <script src="/src/scripts/map.js" defer></script>
+
+        <script src="/src/scripts/auth_ui.js"></script>
      </body>
 </html>

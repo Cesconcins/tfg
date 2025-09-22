@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="ca">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Registrarse · Plataforma Caballos</title>
+    <link rel="stylesheet" href="/src/assets/index.css"/>
+</head>
+<body>
+    <header></header>
+
+    <main class="wrapper">
+        <h1>Registrar-se</h1>
+
+        <form id="register-form" class="form-card">
+            <label>Nombre
+                <input name="nom" type="text" required />
+            </label>
+
+            <label>Apellido
+                <input name="cognom" type="text" required />
+            </label>
+
+            <label>Contraseña
+                <input name="contrassenya" type="password" required />
+            </label>
+
+            <label>Correo
+                <input name="correu_electronic" type="email" required />
+            </label>
+
+            <label>Teléfono
+                <input name="telefon" type="tel" />
+            </label>
+
+            <div class="form-actions">
+                <button type="submit" class="btn-primary">Crear cuenta</button>
+                <a href="/src/pages/login.html" class="btn-secondary">Ya tengo cuenta</a>
+            </div>
+
+            <p id="register-error" class="form-error"></p>
+        </form>
+    </main>
+
+    <footer></footer>
+
+    <script src="/src/scripts/afegir_components.js" defer></script>
+    <script src="/src/scripts/registre_usuari.js" defer></script>
+</body>
+</html>

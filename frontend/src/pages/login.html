@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="ca">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Iniciar sessión · Plataforma Caballos</title>
+    <link rel="stylesheet" href="/src/assets/index.css"/>
+</head>
+<body>
+    <header></header>
+
+    <main class="wrapper">
+        <h1>Iniciar sessió</h1>
+
+        <form id="login-form" class="form-card">
+            <label>Correo
+                <input name="correu_electronic" type="email" required />
+            </label>
+
+            <label>Contraseña
+                <input name="contrassenya" type="password" required />
+            </label>
+
+            <div class="form-actions" >
+                <button type="submit" class="btn-primary">Entrar</button>
+                <a href="/src/pages/register.html" class="btn-secondary">Registrarse</a>
+            </div>
+
+            <p id="login-error" class="form-error"></p>
+        </form>
+    </main>
+
+    <footer></footer>
+
+    <script src="/src/scripts/afegir_components.js" defer></script>
+    <script src="/src/scripts/login_usuari.js" defer></script>
+</body>
+</html>

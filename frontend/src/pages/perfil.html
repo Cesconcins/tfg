@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="ca">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Àrea personal</title>
+  <link rel="stylesheet" href="/src/assets/index.css"/>
+</head>
+<body>
+    <header></header>
+
+<main class="wrapper">
+  <div class="profile-grid">
+    <!-- ESQUERRA: Perfil -->
+    <section class="info-block" id="perfil-box">
+      <h1 style="margin-top:0;">Àrea personal</h1>
+
+      <!-- files en lectura + inputs en línia (amagats) -->
+      <div class="field-row">
+        <strong>Nom:</strong>
+          <span class="v" data-field="nom"></span>
+        <input class="i hidden" data-input="nom" type="text">
+      </div>
+
+      <div class="field-row">
+        <strong>Cognom:</strong>
+          <span class="v" data-field="cognom"></span>
+        <input class="i hidden" data-input="cognom" type="text">
+      </div>
+
+      <div class="field-row">
+        <strong>Correu:</strong>
+          <span class="v" data-field="correu_electronic"></span>
+        <input class="i hidden" data-input="correu_electronic" type="email" disabled>
+      </div>
+
+      <div class="field-row">
+        <strong>Telèfon:</strong>
+          <span class="v" data-field="telefon"></span>
+        <input class="i hidden" data-input="telefon" type="tel">
+      </div>
+
+      <details id="pw-box" class="hidden" style="margin:.5rem 0 0;">
+        <summary>Canviar contrassenya (opcional)</summary>
+        <input class="i" data-input="contrassenya" type="password" placeholder="Nova contrassenya">
+      </details>
+
+      <div id="admin-cta" class="hidden" style="margin:.75rem 0 0;">
+        <a href="/src/pages/admin.html" class="btn-primary">Panell d’administrador</a>
+      </div>
+
+      <div class="inline-actions" style="margin-top:1rem;">
+        <button id="btn-edit"   class="btn-primary"  type="button">Editar</button>
+        <button id="btn-save"   class="btn-primary hidden"  type="button">Desar</button>
+        <button id="btn-cancel" class="btn-secondary hidden" type="button">Cancel·la</button>
+        <button id="btn-delete" class="btn-danger"   type="button">Esborrar compte</button>
+      </div>
+
+      <p id="perfil-msg" class="form-ok hidden">Canvis desats!</p>
+      <p id="perfil-err" class="form-error hidden"></p>
+    </section>
+
+    <!-- DRETA: Anuncis + Esdeveniments -->
+    <section class="right-col">
+      <section class="info-block" style="margin-bottom:1rem;">
+        <div class="section-head">
+          <h2>Mis anuncios</h2>
+          <a class="btn-primary" href="/src/pages/crear_anunci.html">Crear anuncio</a>
+        </div>
+        <div id="meus-anuncis" class="ads-grid"></div>
+      </section>
+
+      <div class="info-block">
+        <h2 style="margin-top:0;">Mis esdevenimientos</h2>
+        <div id="meus-esdeveniments">
+          <p>(Aún no hay esdevenimientos)</p>
+        </div>
+      </div>
+    </section>
+  </div>
+</main>
+
+
+
+    <footer></footer>
+
+    <script src="/src/scripts/afegir_components.js" defer></script>
+    <script src="/src/scripts/auth_ui.js" defer></script>
+    <script src="/src/scripts/perfil.js" defer></script>
+</body>
+</html>

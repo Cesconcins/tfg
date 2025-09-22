@@ -1,19 +1,29 @@
 require('dotenv').config();
-const express      = require('express');
-const cors         = require('cors');
-const usuarisRuta  = require('./rutes/rutes_usuaris');
+const path = require('path'); 
+const express = require('express');
+const cors = require('cors');
 
-const app  = express();
+const usuarisRuta = require('./rutes/rutes_usuaris');
+const anuncisRuta = require('./rutes/rutes_anuncis');
+const perfilRuta = require('./rutes/rutes_perfil');
+const adminRuta  = require('./rutes/rutes_admin');
+
+const app = express();
 const PORT = process.env.PORT || 3001;
 
-app.use(cors());
+app.use(cors({
+  origin: 'http://localhost:5173', credentials: true 
+}));
 app.use(express.json());
 
-// muntar totes les rutes d'usuaris sota /usuaris
-app.use('/usuaris', usuarisRuta);
+app.use('/uploads', express.static(path.join(__dirname, '../frontend/public/uploads')));
+app.use('/', express.static(path.join(__dirname, '../frontend/public')));
+app.use('/src', express.static(path.join(__dirname, '../frontend/src')));
 
-// ruta bàsica de prova
-app.get('/', (_req, res) => res.send('API cavalls en marxa'));
+app.use('/usuaris', usuarisRuta);
+app.use('/anuncis', anuncisRuta);
+app.use('/perfil', perfilRuta);
+app.use('/admin',  adminRuta);
 
 app.listen(PORT, () =>
   console.log(`Servidor escoltant a http://localhost:${PORT}`)

@@ -1,17 +1,16 @@
 const pool = require('../config/db');
 
 // ───────────── CREATE ──────────────────────────────────
-async function createUser({ administrador = false, nom, cognom,
-                            correu_electronic, contrassenya }) {
+async function createUser({ administrador = false, nom, cognom, telefon, correu_electronic, contrassenya }) {
 
   const sql = `
-    INSERT INTO usuaris (administrador, nom, cognom,
-                         correu_electronic, contrassenya)
-    VALUES (?,?,?,?,?)`;
+    INSERT INTO usuaris (administrador, nom, cognom, telefon, correu_electronic, contrassenya)
+    VALUES (?,?,?,?,?,?)`;
   const [result] = await pool.execute(sql, [
     administrador,
     nom,
     cognom,
+    telefon,
     correu_electronic,
     contrassenya
   ]);
@@ -37,21 +36,12 @@ async function updateUser(id, fields) {
   const cols = [];
   const vals = [];
 
-  if (fields.administrador !== undefined) {
-    cols.push('administrador = ?'); vals.push(fields.administrador);
-  }
-  if (fields.nom !== undefined) {
-    cols.push('nom = ?'); vals.push(fields.nom);
-  }
-  if (fields.cognom !== undefined) {
-    cols.push('cognom = ?'); vals.push(fields.cognom);
-  }
-  if (fields.correu_electronic !== undefined) {
-    cols.push('correu_electronic = ?'); vals.push(fields.correu_electronic);
-  }
-  if (fields.contrassenya !== undefined) {
-    cols.push('contrassenya = ?'); vals.push(fields.contrassenya);
-  }
+  if (fields.administrador !== undefined) cols.push('administrador = ?'); vals.push(fields.administrador);
+  if (fields.nom !== undefined) cols.push('nom = ?'); vals.push(fields.nom);
+  if (fields.cognom !== undefined) cols.push('cognom = ?'); vals.push(fields.cognom);
+  if (fields.telefon !== undefined) { cols.push('telefon = ?'); vals.push(fields.telefon); }
+  if (fields.correu_electronic !== undefined) cols.push('correu_electronic = ?'); vals.push(fields.correu_electronic);
+  if (fields.contrassenya !== undefined) cols.push('contrassenya = ?'); vals.push(fields.contrassenya);
 
   if (cols.length === 0) return false;
 
@@ -72,8 +62,7 @@ async function deleteUser(id) {
 // ───────────── LOGIN ────────────────────────────────────
 async function loginUser(correu_electronic, contrassenya) {
   const sql = `
-    SELECT usuari_id, administrador, nom, cognom, correu_electronic,
-           creat_el, actualitzat_el
+    SELECT usuari_id, administrador, nom, cognom, telefon, correu_electronic, creat_el, actualitzat_el
     FROM usuaris
     WHERE correu_electronic = ? AND contrassenya = ?
     LIMIT 1

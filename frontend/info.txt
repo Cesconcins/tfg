@@ -33,3 +33,5 @@ Així React pot fer crides a l’API sense bloquejos.
 
 Enviar mail per verificar l'existència. És molt difícil?
 
+
+npx serve -l 5173

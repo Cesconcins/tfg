@@ -1,14 +1,39 @@
 const express  = require('express');
 const router   = express.Router();
-const usRepo   = require('../controller/usuaris_CRUD');   // camí respecte a routes/
+const usRepo   = require('../controllers/usuaris_CRUD');   // camí respecte a routes/
+const pool     = require('../config/db');
+const crypto   = require('crypto');
+const auth     = require('../middlewares/auth')
+
+
+// Retorna l'usuari autenticat
+router.get('/whoami', auth, (req, res) => {
+  res.json(req.usuari);
+});
 
 // CREATE ────────────────────────────────────────────────
 router.post('/', async (req, res) => {
   try {
+    const { nom, cognom, correu_electronic, contrassenya } = req.body;
+    if (!nom || !cognom || !correu_electronic || typeof contrassenya === 'undefined') {
+      return res.status(400).json({ error: 'Falten camps obligatoris' });
+    }
+
     const id = await usRepo.createUser(req.body);
     res.status(201).json({ usuari_id: id });
   } catch (err) {
-    console.error(err);
+    console.error('Error creant usuari:', err);
+
+    // Duplicat de correu
+    if (err && (err.code === 'ER_DUP_ENTRY' || String(err.message).includes('Duplicate'))) {
+      return res.status(409).json({ error: 'El correu ja està registrat' });
+    }
+
+    // Error de validació propagat
+    if (err.status === 400) {
+      return res.status(400).json({ error: err.message || 'Falten camps' });
+    }
+
     res.status(500).json({ error: 'Error creant usuari' });
   }
 });
@@ -63,16 +88,45 @@ router.delete('/:id', async (req, res) => {
 router.post('/login', async (req, res) => {
   try {
     const { correu_electronic, contrassenya } = req.body;
-    const usuari = await usRepo.loginUser(correu_electronic, contrassenya);
-    if (!usuari) {
-      return res.status(401).json({ error: 'Credencials incorrectes' });
+    if (!correu_electronic || typeof contrassenya === 'undefined') {
+      return res.status(400).json({ error: 'Falten camps' });
     }
-    // Retornem l’usuari (sense contrassenya)
-    res.json(usuari);
+
+    const usuari = await usRepo.loginUser(correu_electronic, contrassenya);
+    if (!usuari) return res.status(401).json({ error: 'Credencials incorrectes' });
+
+    // crea sessió i cookie
+    const token = crypto.randomUUID();
+    await pool.execute(
+      'INSERT INTO sessions (sessio_id, usuari_id, expira_el) VALUES (?, ?, DATE_ADD(NOW(), INTERVAL 7 DAY))',
+      [token, usuari.usuari_id]
+    );
+
+    res.setHeader('Set-Cookie', `sid=${token}; HttpOnly; Path=/; Max-Age=${7*24*60*60}; SameSite=Lax`);
+    res.json(usuari); // sense contrassenya
   } catch (err) {
-    console.error(err);
+    console.error('Error /usuaris/login:', err);
     res.status(500).json({ error: 'Error al fer login' });
   }
 });
+
+// ───────────── LOGOUT ────────────────────────────────────
+router.post('/logout', async (req, res) => {
+  try {
+    const cookie = req.headers.cookie || '';
+    const m = cookie.match(/(?:^|;\s*)sid=([^;]+)/);
+    if (m) {
+      const sid = decodeURIComponent(m[1]);
+      await pool.execute('DELETE FROM sessions WHERE sessio_id = ?', [sid]);
+    }
+    res.setHeader('Set-Cookie', 'sid=; Max-Age=0; Path=/; SameSite=Lax');
+    res.json({ ok: true });
+  } catch (e) {
+    console.error('Error /usuaris/logout:', e);
+    res.status(500).json({ error: 'Error fent logout' });
+  }
+});
+
+
 
 module.exports = router;
