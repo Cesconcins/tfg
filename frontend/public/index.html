@@ -13,6 +13,7 @@
         <header></header>
 
         <main>
+            <!--
             <template id="card-template">
                 <article class="card-anunci">
                     <div class="card-img">
@@ -25,8 +26,35 @@
                         <p class="price card-price"></p>
                         <div class="tags card-tags"></div>
                         <p class="desc card-desc"></p>
-                        <a href="" class="btn-detail">Veure</a>
+                        <a href="" class="btn-detail">Ver detalles</a>
                     </div>
+                </article>
+            </template>
+            -->
+
+            <template id="card-template">
+                <article class="card-anunci card--row">
+                        <!-- ESQUERRA -->
+                        <div class="card-left">
+                            <h3 class="card-title"></h3>
+                            <img class="card-img" src="" alt="">
+                        </div>
+
+                        <!-- DRETA -->
+                        <div class="card-right">
+                            <div class="card-top">
+                                <span class="badge card-badge hidden">🏅 Destacado</span>
+                            </div>
+
+                            <ul class="card-props">
+                                <li><strong>Raza:</strong> <span class="prop-raza"></span></li>
+                                <li><strong>Edad:</strong> <span class="prop-edad"></span></li>
+                                <li><strong>Precio:</strong> <span class="prop-precio"></span></li>
+                                <li><strong>Disciplinas:</strong> <span class="prop-disciplines"></span></li>
+                            </ul>
+
+                            <a href="#" class="btn-detail">Ver detalles</a>
+                        </div>
                 </article>
             </template>
         </main>

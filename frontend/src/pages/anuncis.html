@@ -1,26 +1,118 @@
-<html lang="ca">
+<!DOCTYPE html>
+<html lang="es">
 <head>
-    <meta charset="UTF-8"/>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <title>Plataforma Caballos · Anuncios</title>
-    <link rel="stylesheet" href="../assets/index.css"/>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Plataforma Caballos · Anuncios</title>
+
+  <link rel="stylesheet" href="/src/assets/index.css"/>
+  
+  <meta name="mapbox-token" content="pk.eyJ1IjoiY2VzY29uY2lucyIsImEiOiJjbWMyYXprMzcwNmNvMmtxd2ZneXk3d2F3In0.qeJAnsLCCvTMvbs5_W_WBg">
 </head>
 <body>
-    <header></header>
+  <header></header>
 
-    <main class="wrapper" style="padding:2rem 1rem;">
-        <div id="ads-container" class="ads-grid"></div>    
-    </main>
+  <main class="wrapper listing-page">
+    <div class="listing-grid">
+      <!-- LATERAL FILTRES -->
+      <aside class="filters info-block">
+        <form id="filters-form">
+          <h2 class="filters-title">Filtros</h2>
 
-    <section id="ads-section" class="wrapper ads-wrapper">
-        <button id="ad-to-map" onclick="location.href='../../public/index.html'" class="map-toggle-btn">Mapa</button>
-    </section>
+          <div class="filter-group">
+            <label>Nombre
+              <input type="text" name="nom" placeholder="Ej. Estrella"/>
+            </label>
+            <label>Raza
+              <input type="text" name="raca" placeholder="Ej. Andalús"/>
+            </label>
+            <label>Capa
+              <input type="text" name="capa" placeholder="Ej. tordo, castaño"/>
+            </label>
+          </div>
 
-    <footer></footer>
+          <div class="filter-group grid-2">
+            <label>Precio mín (€)
+              <input type="number" step="0.01" name="preu_min"/>
+            </label>
+            <label>Precio máx (€)
+              <input type="number" step="0.01" name="preu_max"/>
+            </label>
 
-  <script src="../scripts/afegir_components.js" defer></script>
+            <label>Alzada mín (m)
+              <input type="number" step="0.01" name="alcada_min"/>
+            </label>
+            <label>Alzada máx (m)
+              <input type="number" step="0.01" name="alcada_max"/>
+            </label>
+
+            <label>Peso mín (kg)
+              <input type="number" step="0.1" name="pes_min"/>
+            </label>
+            <label>Peso máx (kg)
+              <input type="number" step="0.1" name="pes_max"/>
+            </label>
+
+            <label>Edad mín (años)
+              <input type="number" step="1" name="edat_min"/>
+            </label>
+            <label>Edad máx (años)
+              <input type="number" step="1" name="edat_max"/>
+            </label>
+          </div>
+
+          <div class="filter-group">
+            <span class="label">Sexo</span>
+            <!-- Enviamos en catalán (valores válidos en BBDD) -->
+            <label class="check-inline"><input type="checkbox" name="sexe" value="mascle"> Macho</label>
+            <label class="check-inline"><input type="checkbox" name="sexe" value="mascle castrat"> Macho castrado</label>
+            <label class="check-inline"><input type="checkbox" name="sexe" value="femella"> Hembra</label>
+          </div>
+
+          <div class="filter-group">
+            <label>Disciplinas
+              <select id="sel-disciplines" name="disciplines" multiple size="7"></select>
+            </label>
+            <small class="hint">Mantén Ctrl/Cmd para seleccionar múltiples.</small>
+          </div>
+
+          <div class="filter-group">
+            <span class="label">Ubicación</span>
+            <label>Municipio / CP
+              <input type="text" id="q-mun" placeholder="Ej. Barcelona o 08037"/>
+            </label>
+            <label>Provincia
+              <input type="text" id="q-prov" placeholder="Ej. Barcelona"/>
+            </label>
+            <label>Radio (km)
+              <input type="range" id="q-radi" min="10" max="300" step="10" value="50">
+              <output id="q-radi-out">50 km</output>
+            </label>
+            <!-- coords ocultes que enviarem si fem geocoding -->
+            <input type="hidden" id="q-lat">
+            <input type="hidden" id="q-lon">
+          </div>
+
+          <div class="filter-actions">
+            <button type="submit" class="btn-primary">Aplicar filtros</button>
+            <button type="button" id="btn-reset" class="btn-secondary">Limpiar</button>
+          </div>
+        </form>
+      </aside>
+
+      <!-- RESULTATS -->
+      <section class="results">
+        <div id="ads-container" class="ads-grid"></div>
+      </section>
+    </div>
+  </main>
+
+  <footer></footer>
+
+  <script src="/src/scripts/afegir_components.js" defer></script>
+  <script src="/src/scripts/auth_ui.js" defer></script>
+  <!-- JS de filtres i JS de llistat separats -->
+  <script src="/src/scripts/filtres_anuncis.js" defer></script>
   <script src="/src/scripts/anuncis.js" defer></script>
-
-  <script src="/src/scripts/auth_ui.js"></script>
 </body>
 </html>

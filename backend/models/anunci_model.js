@@ -50,30 +50,61 @@ async function obtenirPerId(id) {
   `, [id]);
   a.disciplines = d.map(x => ({ nom: x.nom }));
 
+  const [imgs] = await pool.query(
+    'SELECT imatge_id, filename, ordre FROM imatge_anunci WHERE anunci_id = ? ORDER BY ordre ASC, imatge_id ASC',
+    [id]
+  );
+  a.imatges = imgs.map(im => ({
+    ...im,
+    url: `/uploads/anuncis/${im.filename}`
+  }));
+
+
   return normalize(a);
 }
 
 async function crear(usuari_id, body) {
   const {
-    nom, raca, preu, data_naixement,
-    capa, alcada, pes, sexe,
-    lat, lon, descripcio, destacat = false
+    nom, raca, preu, data_naixement, capa, alcada, pes, sexe, lat, lon, descripcio, destacat = false, disciplines
   } = body;
 
-  const estat = 'pendent'; // nou anunci → pendent de validació
+  const conn = await pool.getConnection();
+  try {
+    await conn.beginTransaction();
+    const estat = 'pendent'; // nou anunci → pendent de validació
 
-  const [res] = await pool.execute(`
-    INSERT INTO anuncis
-      (usuari_id, nom, raca, preu, data_naixement, capa, alcada, pes, sexe,
-       lat, lon, destacat, estat, descripcio)
-    VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)
-  `, [
-    usuari_id, nom, raca, preu, data_naixement || null,
-    capa || null, alcada || null, pes || null, sexe || null,
-    lat || null, lon || null, !!destacat, estat, descripcio || null
-  ]);
+    const [res] = await pool.execute(`
+      INSERT INTO anuncis
+        (usuari_id, nom, raca, preu, data_naixement, capa, alcada, pes, sexe,
+        lat, lon, destacat, estat, descripcio)
+      VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)
+    `, [
+      usuari_id, nom, raca, preu, data_naixement || null,
+      capa || null, alcada || null, pes || null, sexe || null,
+      lat || null, lon || null, !!destacat, estat, descripcio || null
+    ]);
 
-  return res.insertId;
+    const anunciId = res.insertId;
+
+    // Inserció de disciplines (si n’hi ha)
+    const ids = Array.isArray(disciplines)
+      ? [...new Set(disciplines.map(Number).filter(Boolean))]
+      : [];
+    if (ids.length) {
+      const values = ids.map(did => [anunciId, did]);
+      await conn.query(
+        'INSERT INTO anunci_disciplina (anunci_id, disciplina_id) VALUES ?',
+        [values]
+      );
+    }
+    await conn.commit();
+    return anunciId;
+  } catch (e) {
+    await conn.rollback();
+    throw e;
+  } finally {
+    conn.release();
+  }
 }
 
 async function actualitzar(id, body) {

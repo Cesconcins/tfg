@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Àrea personal</title>
+  <title>Area personal</title>
   <link rel="stylesheet" href="/src/assets/index.css"/>
 </head>
 <body>
@@ -13,50 +13,50 @@
   <div class="profile-grid">
     <!-- ESQUERRA: Perfil -->
     <section class="info-block" id="perfil-box">
-      <h1 style="margin-top:0;">Àrea personal</h1>
+      <h1 style="margin-top:0;">Area personal</h1>
 
       <!-- files en lectura + inputs en línia (amagats) -->
       <div class="field-row">
-        <strong>Nom:</strong>
+        <strong>Nombre:</strong>
           <span class="v" data-field="nom"></span>
         <input class="i hidden" data-input="nom" type="text">
       </div>
 
       <div class="field-row">
-        <strong>Cognom:</strong>
+        <strong>Apellido:</strong>
           <span class="v" data-field="cognom"></span>
         <input class="i hidden" data-input="cognom" type="text">
       </div>
 
       <div class="field-row">
-        <strong>Correu:</strong>
+        <strong>Correo:</strong>
           <span class="v" data-field="correu_electronic"></span>
         <input class="i hidden" data-input="correu_electronic" type="email" disabled>
       </div>
 
       <div class="field-row">
-        <strong>Telèfon:</strong>
+        <strong>Teléfono:</strong>
           <span class="v" data-field="telefon"></span>
         <input class="i hidden" data-input="telefon" type="tel">
       </div>
 
       <details id="pw-box" class="hidden" style="margin:.5rem 0 0;">
-        <summary>Canviar contrassenya (opcional)</summary>
+        <summary>Cambiar contraseña (opcional)</summary>
         <input class="i" data-input="contrassenya" type="password" placeholder="Nova contrassenya">
       </details>
 
       <div id="admin-cta" class="hidden" style="margin:.75rem 0 0;">
-        <a href="/src/pages/admin.html" class="btn-primary">Panell d’administrador</a>
+        <a href="/src/pages/admin.html" class="btn-primary">Panel del administrador</a>
       </div>
 
       <div class="inline-actions" style="margin-top:1rem;">
-        <button id="btn-edit"   class="btn-primary"  type="button">Editar</button>
-        <button id="btn-save"   class="btn-primary hidden"  type="button">Desar</button>
-        <button id="btn-cancel" class="btn-secondary hidden" type="button">Cancel·la</button>
-        <button id="btn-delete" class="btn-danger"   type="button">Esborrar compte</button>
+        <button id="btn-edit" class="btn-primary" type="button">Editar</button>
+        <button id="btn-save" class="btn-primary hidden" type="button">Guardar</button>
+        <button id="btn-cancel" class="btn-secondary hidden" type="button">Cancelar</button>
+        <button id="btn-delete" class="btn-danger" type="button">Eliminar cuenta</button>
       </div>
 
-      <p id="perfil-msg" class="form-ok hidden">Canvis desats!</p>
+      <p id="perfil-msg" class="form-ok hidden">Cambios guardados!</p>
       <p id="perfil-err" class="form-error hidden"></p>
     </section>
 

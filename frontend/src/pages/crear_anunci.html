@@ -5,6 +5,8 @@
   <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
   <title>Anuncio nuevo</title>
   <link rel="stylesheet" href="/src/assets/index.css"/>
+  <link rel="stylesheet" href="https://api.mapbox.com/mapbox-gl-js/v2.13.0/mapbox-gl.css">
+  <link rel="stylesheet" href="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v4.7.2/mapbox-gl-geocoder.css">
 </head>
 <body>
   <header></header>
@@ -29,6 +31,41 @@
         <input name="data_naixement" type="date" />
       </label>
 
+      <label>Disciplinas
+        <select id="sel-disciplines" name="disciplines" multiple size="7"></select>
+        <small style="display:block;color:#6b7280;margin-top:.25rem;">
+          Mantén Ctrl/Cmd per seleccionar múltiples.
+        </small>
+      </label>
+
+      <fieldset class="form-grid">
+        <legend>Ubicación</legend>
+
+        <label>Código postal
+          <input id="cp" name="cp" inputmode="numeric" />
+        </label>
+
+        <label>Población
+          <input id="poblacio" name="poblacio" />
+        </label>
+
+        <label>Dirección
+          <input id="adreca" name="adreca" />
+        </label>
+
+        <div class="form-actions" style="margin:.25rem 0 1rem;">
+          <button type="button" id="btn-geocode" class="btn-secondary">Buscar en el mapa</button>
+        </div>
+
+        <div id="geocoder"></div>
+        <div id="mini-map" class="hidden" style="height:300px;border-radius:.5rem;"></div>
+      </fieldset>
+
+      <!-- Coordenades ocultes perquè es desin a la BBDD -->
+      <input id="lat" name="lat" type="number" step="0.000001" class="hidden">
+      <input id="lon" name="lon" type="number" step="0.000001" class="hidden">
+
+
       <label>Capa
         <input name="capa" />
       </label>
@@ -42,20 +79,29 @@
       </label>
 
       <label>Sexo
-        <input name="sexe" placeholder="macho, hembra, macho castrado..." />
-      </label>
-
-      <label>Latitud
-        <input name="lat" type="number" step="0.000001" />
-      </label>
-
-      <label>Longitud
-        <input name="lon" type="number" step="0.000001" />
+        <select id="sexe" name="sexe">
+          <option value="">—</option>
+          <option value="macho">Macho</option>
+          <option value="hembra">Hembra</option>
+          <option value="macho_castrado">Macho castrado</option>
+        </select>
       </label>
 
       <label>Descripción
         <textarea name="descripcio" rows="4"></textarea>
       </label>
+
+      <fieldset class="form-grid">
+        <legend>Imágenes</legend>
+        <label>Selecciona imágenes (puedes elegir varias)
+          <input id="file-imatges" type="file" accept="image/*" multiple />
+        </label>
+        <small class="hint">Tamaño máximo por archivo: 5MB.</small>
+
+        <!-- Galería (sólo útil al editar o tras subir) -->
+        <div id="galeria" class="gallery-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:.5rem;margin-top:.5rem;"></div>
+      </fieldset>
+
 
       <div class="form-actions">
         <button type="submit" class="btn-primary">Guardar</button>
@@ -71,6 +117,8 @@
 
   <script src="/src/scripts/afegir_components.js" defer></script>
   <script src="/src/scripts/auth_ui.js" defer></script>
-  <script src="/src/scripts/anunci_form.js" defer></script>
+  <script src="https://api.mapbox.com/mapbox-gl-js/v2.13.0/mapbox-gl.js"></script>
+  <script src="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v4.7.2/mapbox-gl-geocoder.min.js"></script>
+  <script src="/src/scripts/crear_anunci.js" defer></script>
 </body>
 </html>

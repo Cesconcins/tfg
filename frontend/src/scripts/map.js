@@ -7,14 +7,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
   const map = new mapboxgl.Map({
     container: 'map',
-    style:     'mapbox://styles/mapbox/streets-v12',
-    center:    [2.24741, 41.45004],
-    zoom:      13.5
+    style: 'mapbox://styles/mapbox/streets-v12',
+    center: [2.24741, 41.45004],
+    zoom: 13.5
   });
 
   let userMarker = null;
-  let userPopup  = null;
-  let userPos    = null;       // ← posició usuari (si dóna permís)
+  let userPopup = null;
+  let userPos = null;       // ← posició usuari (si dóna permís)
   let allAnuncis = [];         // ← cache tots els anuncis
 
   navigator.geolocation.watchPosition(
@@ -107,7 +107,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function renderSidebar(list) {
     const cont = document.getElementById('sidebar');
-    if (!cont) return; // evita petar si no hi ha sidebar en aquesta pàgina
+    if (!cont) return;
     const tpl  = document.getElementById('card-template');
     cont.innerHTML = '';
 
@@ -118,29 +118,38 @@ document.addEventListener('DOMContentLoaded', () => {
 
     list.forEach(a => {
       const clone = tpl.content.cloneNode(true);
-      const img   = clone.querySelector('img');
-      const badge = clone.querySelector('.badge');
 
-      clone.querySelector('.card-nom').textContent    = a.nom;
-      clone.querySelector('.card-sub').textContent    = `${a.raca} • ${calculateAge(a.data_naixement)} anys`;
-      clone.querySelector('.card-price').textContent  = `${Number(a.preu).toFixed(2)} €`;
-      clone.querySelector('.card-desc').textContent   = a.descripcio.slice(0, 60) + '…';
-      clone.querySelector('.btn-detail').href         = `/../pages/detalls_anuncis.html?id=${a.anunci_id}`;
+      // ESQUERRA
+      const img   = clone.querySelector('.card-img');
+      const title = clone.querySelector('.card-title');
+      title.textContent = a.nom || '—';
+      img.src = `http://localhost:3001/anuncis/${a.anunci_id}/portada`;
+      img.alt = `Foto de ${a.nom || 'anunci'}`;
 
-      if (a.destacat) badge.classList.remove('hidden');
-      img.src = '/../../public/uploads/cavall_prova.jpg';
-      img.alt = `Foto de ${a.nom}`;
+      // DRETA · BADGE destacat
+      const featured = clone.querySelector('.card-badge');
+      if (a.destacat) featured.classList.remove('hidden');
+      else featured.classList.add('hidden');
 
-      const tags = clone.querySelector('.card-tags');
-      (a.disciplines || []).forEach(d => {
-        const span = document.createElement('span');
-        span.className   = 'tag';
-        span.textContent = d.nom;
-        tags.appendChild(span);
-      });
+      // Propietats
+      clone.querySelector('.prop-raza').textContent  = a.raca || '—';
+      const anys = a.data_naixement ? `${calculateAge(a.data_naixement)} años` : '—';
+      clone.querySelector('.prop-edad').textContent  = anys;
+      clone.querySelector('.prop-precio').textContent= a.preu!=null ? `${Number(a.preu).toFixed(2)} €` : '—';
+
+      const discWrap = clone.querySelector('.prop-disciplines');
+      const discs = (a.disciplines||[]);
+      discWrap.innerHTML = discs.length
+        ? discs.map(d=>`<span class="tag">${d.nom}</span>`).join('')
+        : '—';
+
+      // Enllaç a detalls
+      const link = clone.querySelector('.btn-detail');
+      link.href = `/src/pages/detalls_anuncis.html#id=${a.anunci_id}`;
 
       cont.appendChild(clone);
     });
+
   }
 
   // ajuda: calcular edat

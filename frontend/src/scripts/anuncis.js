@@ -1,39 +1,46 @@
-document.addEventListener('DOMContentLoaded', async () => {
+document.addEventListener('DOMContentLoaded', () => {
   const cont = document.getElementById('ads-container');
-  try {
-    const res   = await fetch('http://localhost:3001/anuncis');
-    const dades = await res.json();
-    dades.forEach(a => {
-      const card = document.createElement('div');
-      card.className = 'card-anunci';
-      card.innerHTML = `
+  if (!cont) return;
+
+  function cardHTML(a){
+    return `
+      <article class="card-anunci">
         <div class="card-img">
-          <img src="../../public/uploads/cavall_prova.jpg" alt="Foto ${a.nom}">
-          ${a.destacat ? '<span class="badge">Destacat</span>' : ''}
+          <img src="http://localhost:3001/anuncis/${a.anunci_id}/portada">
+          ${a.destacat ? '<span class="badge">🏅 Destacado</span>' : ''}
         </div>
         <div class="card-body">
           <h3>${a.nom}</h3>
-          <p class="sub">${a.raca} • ${calculateAge(a.data_naixement)} anys</p>
+          <p class="sub">${a.raca || ''}</p>
           <p class="price">${Number(a.preu).toFixed(2)} €</p>
-          <div class="tags">
-          ${
-            (Array.isArray(a.disciplines) ? a.disciplines : [])
-            .map(d => `<span class="tag">${d.nom ?? d}</span>`)
-            .join('')
-          }
-          <p class="desc">${a.descripcio.slice(0,80)}…</p>
-          <a href="detall.html?id=${a.anunci_id}" class="btn-detail">Veure detall</a>
-        </div>`;
-      cont.appendChild(card);
-    });
-  } catch(e){ console.error(e); cont.innerHTML='<p>Error carregant anuncis.</p>'; }
-});
+          ${a.distancia_km != null ? `<p class="dist">${a.distancia_km.toFixed(1)} km</p>` : ''}
+          <div class="tags">${(a.disciplines||[]).map(d=>`<span class="tag">${d.nom}</span>`).join('')}</div>
+          <a class="btn-detail" href="/src/pages/detalls_anuncis.html?id=${a.anunci_id}">Ver detalle</a>
+        </div>
+      </article>
+    `;
+  }
 
-// Funcció simple per calcular edats
-function calculateAge(dnaStr) {
-  const dna=new Date(dnaStr), now=new Date();
-  let age=now.getFullYear()-dna.getFullYear();
-  dna.setFullYear(now.getFullYear());
-  if (dna>now) age--;
-  return age;
-}
+  async function carregar(paramsObj){
+    const qs = new URLSearchParams(paramsObj || {}).toString();
+    cont.innerHTML = '<p>Cargando…</p>';
+    try {
+      const r = await fetch(`http://localhost:3001/anuncis${qs ? `?${qs}` : ''}`);
+      const L = r.ok ? await r.json() : [];
+      if (!L.length) { cont.innerHTML = '<p>No hay anuncios que cumplan los filtros.</p>'; return; }
+      cont.innerHTML = L.map(cardHTML).join('');
+    } catch (e){
+      console.error(e);
+      cont.innerHTML = '<p>Error cargando anuncios.</p>';
+    }
+  }
+
+  // Reacciona als canvis de filtres
+  window.addEventListener('filters:changed', (ev) => {
+    carregar(ev.detail || {});
+  });
+
+  // Carrega inicial si s’entra amb ?query
+  const initial = Object.fromEntries(new URLSearchParams(location.search));
+  carregar(initial);
+});

@@ -9,12 +9,7 @@ module.exports = async function auth(req, res, next) {
 
         const sid = decodeURIComponent(m[1]);
         const [rows] = await pool.execute(`
-            SELECT u.usuari_id,
-                   u.nom,
-                   u.cognom,
-                   u.correu_electronic,
-                   u.telefon,
-                   u.administrador
+            SELECT u.usuari_id, u.nom, u.cognom, u.correu_electronic, u.telefon, u.administrador
             FROM sessions s
             JOIN usuaris  u ON u.usuari_id = s.usuari_id
             WHERE s.sessio_id = ?

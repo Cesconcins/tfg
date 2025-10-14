@@ -1,18 +1,19 @@
 const pool = require('../config/db');
 
 // ───────────── CREATE ──────────────────────────────────
-async function createUser({ administrador = false, nom, cognom, telefon, correu_electronic, contrassenya }) {
+async function createUser({ administrador = false, nom, cognom, telefon, correu_electronic, contrassenya, actiu = true}) {
 
   const sql = `
-    INSERT INTO usuaris (administrador, nom, cognom, telefon, correu_electronic, contrassenya)
-    VALUES (?,?,?,?,?,?)`;
+    INSERT INTO usuaris (administrador, nom, cognom, telefon, correu_electronic, contrassenya, actiu)
+    VALUES (?,?,?,?,?,?,?)`;
   const [result] = await pool.execute(sql, [
     administrador,
     nom,
     cognom,
     telefon,
     correu_electronic,
-    contrassenya
+    contrassenya,
+    actiu
   ]);
 
   return result.insertId;
@@ -26,22 +27,40 @@ async function getUserById(id) {
   return rows[0] || null;
 }
 
-async function getAllUsers() {
-  const [rows] = await pool.query('SELECT * FROM usuaris');
+async function getAllUsers({ actiu } = {}) {
+  const params = [];
+  let where = '';
+  if (actiu === 0 || actiu === 1) { where = 'WHERE u.actiu = ?'; params.push(actiu); }
+
+  const [rows] = await pool.query(
+    `
+    SELECT
+      u.*,
+      (SELECT COUNT(*) FROM anuncis a WHERE a.usuari_id = u.usuari_id) AS num_anuncis
+    FROM usuaris u
+    ${where}
+    ORDER BY u.creat_el DESC
+    `,
+    params
+  );
   return rows;
 }
+
+const toSQL = v => (v === undefined ? null : v);
 
 // ───────────── UPDATE ──────────────────────────────────
 async function updateUser(id, fields) {
   const cols = [];
   const vals = [];
+  const add = (sqlFrag, v) => { cols.push(sqlFrag); vals.push(toSQL(v)); };
 
-  if (fields.administrador !== undefined) cols.push('administrador = ?'); vals.push(fields.administrador);
-  if (fields.nom !== undefined) cols.push('nom = ?'); vals.push(fields.nom);
-  if (fields.cognom !== undefined) cols.push('cognom = ?'); vals.push(fields.cognom);
-  if (fields.telefon !== undefined) { cols.push('telefon = ?'); vals.push(fields.telefon); }
-  if (fields.correu_electronic !== undefined) cols.push('correu_electronic = ?'); vals.push(fields.correu_electronic);
-  if (fields.contrassenya !== undefined) cols.push('contrassenya = ?'); vals.push(fields.contrassenya);
+  if ('administrador' in fields) { add('administrador = ?', !!fields.administrador); }
+  if ('nom' in fields) { add('nom = ?', fields.nom); }
+  if ('cognom' in fields) { add('cognom = ?', fields.cognom); }
+  if ('telefon' in fields) { add('telefon = ?', fields.telefon); }
+  if ('correu_electronic' in fields) { add('correu_electronic = ?', fields.correu_electronic); }
+  if ('contrassenya' in fields) { add('contrassenya = ?', fields.contrassenya); }
+  if ('actiu' in fields) add('actiu = ?', !!fields.actiu);
 
   if (cols.length === 0) return false;
 
@@ -62,13 +81,24 @@ async function deleteUser(id) {
 // ───────────── LOGIN ────────────────────────────────────
 async function loginUser(correu_electronic, contrassenya) {
   const sql = `
-    SELECT usuari_id, administrador, nom, cognom, telefon, correu_electronic, creat_el, actualitzat_el
+    SELECT usuari_id, administrador, nom, cognom, telefon, correu_electronic, actiu, creat_el, actualitzat_el
     FROM usuaris
     WHERE correu_electronic = ? AND contrassenya = ?
     LIMIT 1
   `;
   const [rows] = await pool.execute(sql, [correu_electronic, contrassenya]);
-  return rows[0] || null;
+  const u = rows[0] || null;
+  if (u && !u.actiu) return null;
+  return u;
+}
+
+// ───────────── PATCH actiu ─────────────────────────────
+async function setUserActive(id, actiu) {
+  const [r] = await pool.execute(
+    'UPDATE usuaris SET actiu = ?, actualitzat_el = CURRENT_TIMESTAMP WHERE usuari_id = ?',
+    [!!actiu, id]
+  );
+  return r.affectedRows > 0;
 }
 
 module.exports = {
@@ -77,5 +107,6 @@ module.exports = {
   getAllUsers,
   updateUser,
   deleteUser,
-  loginUser
+  loginUser,
+  setUserActive
 };

@@ -13,28 +13,28 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   // 2) Referències als camps (null-safe)
   const spans  = {
-    nom:               $('[data-field="nom"]'),
-    cognom:            $('[data-field="cognom"]'),
+    nom: $('[data-field="nom"]'),
+    cognom: $('[data-field="cognom"]'),
     correu_electronic: $('[data-field="correu_electronic"]'),
-    telefon:           $('[data-field="telefon"]')
+    telefon: $('[data-field="telefon"]')
   };
   const inputs = {
-    nom:               $('[data-input="nom"]'),
-    cognom:            $('[data-input="cognom"]'),
+    nom: $('[data-input="nom"]'),
+    cognom: $('[data-input="cognom"]'),
     correu_electronic: $('[data-input="correu_electronic"]'),
-    telefon:           $('[data-input="telefon"]'),
-    contrassenya:      $('[data-input="contrassenya"]')
+    telefon: $('[data-input="telefon"]'),
+    contrassenya: $('[data-input="contrassenya"]')
   };
 
   // (Opcional) debug si falta algun node
-  Object.entries(spans).forEach(([k, el])  => { if (!el)  console.warn(`Falta <span data-field="${k}">`); });
+  Object.entries(spans).forEach(([k, el]) => { if (!el)  console.warn(`Falta <span data-field="${k}">`); });
   Object.entries(inputs).forEach(([k, el]) => { if (!el) console.warn(`Falta <input data-input="${k}">`); });
 
-  const btnEdit   = $('#btn-edit');
-  const btnSave   = $('#btn-save');
+  const btnEdit = $('#btn-edit');
+  const btnSave = $('#btn-save');
   const btnCancel = $('#btn-cancel');
   const btnDelete = $('#btn-delete');
-  const pwBox     = $('#pw-box');
+  const pwBox = $('#pw-box');
 
   let user = null;
 
@@ -48,15 +48,15 @@ document.addEventListener('DOMContentLoaded', async () => {
   if (cta) cta.classList.toggle('hidden', !isAdmin);
 
   const fill = (u) => {
-    if (spans.nom)               spans.nom.textContent               = u.nom ?? '';
-    if (spans.cognom)            spans.cognom.textContent            = u.cognom ?? '';
+    if (spans.nom) spans.nom.textContent = u.nom ?? '';
+    if (spans.cognom) spans.cognom.textContent = u.cognom ?? '';
     if (spans.correu_electronic) spans.correu_electronic.textContent = u.correu_electronic ?? '';
-    if (spans.telefon)           spans.telefon.textContent           = u.telefon ?? '-';
+    if (spans.telefon) spans.telefon.textContent = u.telefon ?? '-';
 
-    if (inputs.nom)               inputs.nom.value               = u.nom ?? '';
-    if (inputs.cognom)            inputs.cognom.value            = u.cognom ?? '';
+    if (inputs.nom) inputs.nom.value = u.nom ?? '';
+    if (inputs.cognom) inputs.cognom.value = u.cognom ?? '';
     if (inputs.correu_electronic) inputs.correu_electronic.value = u.correu_electronic ?? '';
-    if (inputs.telefon)           inputs.telefon.value           = u.telefon ?? '';
+    if (inputs.telefon) inputs.telefon.value = u.telefon ?? '';
   };
   fill(user);
 
@@ -65,10 +65,10 @@ document.addEventListener('DOMContentLoaded', async () => {
   const setMode = (on) => {
     $$('.field-row .v').forEach(e => e.classList.toggle('hidden', on));
     $$('.field-row .i').forEach(e => e.classList.toggle('hidden', !on));
-    if (btnEdit)   btnEdit.classList.toggle('hidden', on);
-    if (btnSave)   btnSave.classList.toggle('hidden', !on);
+    if (btnEdit) btnEdit.classList.toggle('hidden', on);
+    if (btnSave) btnSave.classList.toggle('hidden', !on);
     if (btnCancel) btnCancel.classList.toggle('hidden', !on);
-    if (pwBox)     pwBox.classList.toggle('hidden', !on);
+    if (pwBox) pwBox.classList.toggle('hidden', !on);
     if (msg) msg.classList.add('hidden');
     if (err) err.classList.add('hidden');
   };
@@ -83,8 +83,8 @@ document.addEventListener('DOMContentLoaded', async () => {
       if (err) err.classList.add('hidden');
 
       const payload = {
-        nom:     inputs.nom?.value.trim(),
-        cognom:  inputs.cognom?.value.trim(),
+        nom: inputs.nom?.value.trim(),
+        cognom: inputs.cognom?.value.trim(),
         telefon: inputs.telefon?.value.trim() || null
       };
       const pwd = inputs.contrassenya?.value.trim();
@@ -142,7 +142,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             <p class="sub">${a.raça || ''}</p>
             <p class="price">${Number(a.preu).toFixed(2)} €</p>
             <div class="tags">${(a.disciplines||[]).map(d=>`<span class="tag">${d.nom}</span>`).join('')}</div>
-            <a class="btn-detail" href="/src/pages/detalls_anuncis.html?id=${a.anunci_id}">Veure detall</a>
+            <a class="btn-detail" href="/src/pages/detalls_anuncis.html?id=${a.anunci_id}">Ver más detalles</a>
           </div>`;
         cont.appendChild(card);
       });

@@ -20,4 +20,11 @@ router.delete('/:id', auth, ownerOrAdmin, ctrl.eliminar);
 // Validació (només admin)
 router.patch('/:id/estat', auth, adminOnly, ctrl.canviarEstat);
 
+// Historial revisions admin
+const rev = require('../models/revisio_anunci_model');
+router.get('/:id/revisions', auth, adminOnly, async (req, res) => {
+  try { res.json(await rev.llistarPerAnunci(req.params.id)); }
+  catch (e) { console.error(e); res.status(500).json({ error: 'Error obtenint revisions' }); }
+});
+
 module.exports = router;
