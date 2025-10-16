@@ -41,7 +41,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                     show('nav-login', true);
                     show('nav-register', true);
                     // ves a inici
-                    location.href = '/public/index.html';
+                    location.href = '/../index.html';
                 };
             }
 

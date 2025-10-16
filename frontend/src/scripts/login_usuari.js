@@ -24,7 +24,7 @@ document.addEventListener('DOMContentLoaded', () => {
             localStorage.setItem('sessio_usuari', JSON.stringify(usuari));
 
             // Redirigeix inici
-            window.location.href = '/public/index.html';
+            window.location.href = '/../index.html';
         } catch (err) {
             console.error(err);
             errorBox.textContent = 'No ha sido posible iniciar sessión. Revisa las credenciales.';
