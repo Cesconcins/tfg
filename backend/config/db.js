@@ -8,20 +8,23 @@ const mysql = require('mysql2/promise');
   }
 });
 
+// Comentar aquesta crida si s'utilitza el fitxer .env
+/*
 const pool = mysql.createPool({
     host: 'localhost',
-    user: 'cavalls',
-    password: '',
+    user: 'francesc',
+    password: 'contrasenya_segura',
     database: 'cavalls_db'
 });
+*/
 
-/* el .env no va amb passwords buides
+// el .env no va amb passwords buides
 const pool = mysql.createPool({
   host:               process.env.DB_HOST,
   user:               process.env.DB_USER,
   password:           process.env.DB_PASS,
   database:           process.env.DB_NAME
 });
-*/
+
 
 module.exports = pool;
