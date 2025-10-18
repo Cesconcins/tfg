@@ -3,6 +3,7 @@ const path = require('path');
 const express = require('express');
 const cors = require('cors');
 
+const mountDocs = require('./docs');
 const usuarisRuta = require('./rutes/rutes_usuaris');
 const anuncisRuta = require('./rutes/rutes_anuncis');
 const perfilRuta = require('./rutes/rutes_perfil');
@@ -18,16 +19,18 @@ app.use(cors({
 }));
 app.use(express.json());
 
+mountDocs(app);
+
 app.use('/uploads', express.static(path.join(__dirname, '../frontend/public/uploads/anuncis')));
 app.use('/', express.static(path.join(__dirname, '../frontend/public')));
 app.use('/src', express.static(path.join(__dirname, '../frontend/src')));
 
-app.use('/usuaris', usuarisRuta);
-app.use('/anuncis', anuncisRuta);
-app.use('/perfil', perfilRuta);
-app.use('/admin',  adminRuta);
-app.use('/disciplines', disciplinesRuta);
-app.use('/anuncis', rutesImatgesAnuncis);
+app.use('/api/usuaris', usuarisRuta);
+app.use('/api/anuncis', anuncisRuta);
+app.use('/api/perfil', perfilRuta);
+app.use('/api/admin',  adminRuta);
+app.use('/api/disciplines', disciplinesRuta);
+app.use('/api/anuncis', rutesImatgesAnuncis);
 
 app.listen(PORT, () =>
   console.log(`Servidor escoltant a http://localhost:${PORT}`)

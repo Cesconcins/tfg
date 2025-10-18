@@ -1,0 +1,65 @@
+@startuml
+title Cercar anuncis amb filtres (MVC)
+
+actor Usuari
+boundary "Vista anuncis" as Vista
+entity "Mapbox Geocoding" as Mapbox
+control "Router anuncis\nbackend/rutes/rutes_anuncis.js" as Router
+control "AnunciController.llistar\nbackend/controllers/anunci_controller.js" as Controller
+control "FiltresAnuncis.llistarAmbFiltres\nbackend/middlewares/filtres_anuncis.js" as Filtres
+database "MySQL (pool)\nbackend/config/db.js" as DB
+
+note over Usuari,Vista
+Precondició: filtres (raça, preu, ubicació…) són vàlids.
+Sense ubicació → no es calcula distància.
+end note
+
+Usuari -> Vista : Omple formulari i envia
+activate Vista
+Vista -> Vista : buildParams()
+alt Filtre amb ubicació
+  Vista -> Mapbox : geocode(municipi|província)
+  Mapbox --> Vista : lat/lon
+  Vista -> Vista : Afegeix lat/lon i radi
+else Sense ubicació
+  Vista -> Vista : Manté filtres sense distància
+end
+Vista -> Vista : dispatch filters:changed
+Vista -> Router : GET /anuncis?filtres
+deactivate Vista
+
+activate Router
+Router -> Controller : llistar(req.query)
+activate Controller
+Controller -> Filtres : llistarAmbFiltres(pool, query)
+activate Filtres
+Filtres -> Filtres : buildListQuery(query)
+note right of Filtres
+Aplica estat=validat per públic,
+text, rangs i disciplines.
+Si hi ha lat/lon → Haversine i ORDER BY distància.
+Per defecte: destacat DESC, creat_el DESC.
+LIMIT/OFFSET per paginació.
+end note
+Filtres -> DB : pool.query(sql, params)
+activate DB
+DB --> Filtres : files d'anuncis
+deactivate DB
+Filtres -> Filtres : postProcess(disciplines)
+Filtres --> Controller : llista ordenada i paginada
+deactivate Filtres
+Controller --> Router : JSON anuncis
+deactivate Controller
+Router --> Vista : 200 OK + llista
+deactivate Router 
+
+activate Vista
+Vista -> Vista : Renderitza targetes destacat/distància
+Vista --> Usuari : Mostra llista d'anuncis
+deactivate Vista
+
+note over Vista,Usuari
+Resultat: llista paginada d'anuncis validats,
+ordenada per destacat i distància si disponible.
+end note
+@enduml

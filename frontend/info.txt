@@ -6,7 +6,7 @@ Instal·lacions:
 
 4.2. Integració amb el backend
 
-    A cavalls-frontend, faràs crides a l’API del backend. P. ex. en un component React:
+    A cavalls-frontend, es faran les crides a l’API del backend. P. ex. en un component React:
 
 useEffect(() => {
   fetch('http://localhost:3001/anuncis')
@@ -14,9 +14,9 @@ useEffect(() => {
     .then((data) => setAnuncis(data));
 }, []);
 
-Assegura’t que el backend està escoltant a un altre port (p. ex. 3001) per evitar conflictes.
+Assegurar que el backend està escoltant a un altre port (p. ex. 3001) per evitar conflictes.
 
-Si tens problemes de CORS, instal·la cors al backend:
+Si hi ha problemes amb CORS, instal·lar cors al backend:
 
 npm install cors
 

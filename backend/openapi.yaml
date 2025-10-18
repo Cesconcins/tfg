@@ -2,599 +2,1202 @@ openapi: 3.1.0
 info:
   title: Plataforma Cavalls API
   version: 1.0.0
-  description: |
-    API REST per a la plataforma de venda de cavalls.
-    Aquest document segueix un enfocament spec-first. Afegeix/mantén aquí tots els endpoints.
+  description: 'API REST per a la plataforma de venda de cavalls.
 
+    Aquesta especificació recull els endpoints detectats al projecte Express i està preparada per Swagger UI (/docs) i per servir el JSON a /openapi.json.'
 servers:
-  - url: http://localhost:3000/api
-    description: Local
-
+- url: http://localhost:3001/api
+  description: Local (backend Express)
 tags:
-  - name: Usuaris
-    description: Operacions d'autenticació i gestió d'usuaris (inclòs ADMIN)
-
+- name: Usuaris
+  description: Autenticació i gestió d'usuaris
+- name: Perfil
+  description: Operacions sobre el perfil autenticat
+- name: Anuncis
+  description: CRUD d'anuncis
+- name: Imatges
+  description: Gestió d'imatges d'anuncis
+- name: Disciplines
+  description: Llistat de disciplines
+- name: Admin
+  description: Endpoints d'administració
 components:
-  # // Esquemes de seguretat. El backend usa cookie de sessió 'sid'.
   securitySchemes:
     cookieAuth:
       type: apiKey
       in: cookie
       name: sid
-      description: |
-        Autenticació per cookie de sessió (sid). El login estableix `Set-Cookie: sid=...`.
-
+      description: Sessió d'usuari via cookie `sid` (estableix/expira al login/logout).
+  schemas:
+    OkResponse:
+      type: object
+      properties:
+        ok:
+          type: boolean
+      required:
+      - ok
+    ErrorResponse:
+      type: object
+      properties:
+        error:
+          type: string
+      required:
+      - error
+    Usuari:
+      type: object
+      properties:
+        usuari_id:
+          type: integer
+        nom:
+          type: string
+        cognom:
+          type: string
+        correu_electronic:
+          type: string
+          format: email
+        telefon:
+          type:
+          - string
+          - 'null'
+        administrador:
+          type: boolean
+      required:
+      - usuari_id
+      - nom
+      - cognom
+      - correu_electronic
+      - administrador
+    UsuariCreate:
+      type: object
+      properties:
+        administrador:
+          type: boolean
+          default: false
+        nom:
+          type: string
+        cognom:
+          type: string
+        telefon:
+          type:
+          - string
+          - 'null'
+        correu_electronic:
+          type: string
+          format: email
+        contrassenya:
+          type: string
+        actiu:
+          type: boolean
+          default: true
+      required:
+      - nom
+      - cognom
+      - correu_electronic
+      - contrassenya
+    UsuariUpdate:
+      type: object
+      properties:
+        administrador:
+          type: boolean
+        nom:
+          type: string
+        cognom:
+          type: string
+        telefon:
+          type:
+          - string
+          - 'null'
+        correu_electronic:
+          type: string
+          format: email
+        contrassenya:
+          type: string
+        actiu:
+          type: boolean
+    LoginRequest:
+      type: object
+      properties:
+        correu_electronic:
+          type: string
+          format: email
+        contrassenya:
+          type: string
+      required:
+      - correu_electronic
+      - contrassenya
+    Disciplina:
+      type: object
+      properties:
+        disciplina_id:
+          type: integer
+        nom:
+          type: string
+      required:
+      - disciplina_id
+      - nom
+    DisciplinesArray:
+      type: array
+      items:
+        $ref: '#/components/schemas/Disciplina'
+    Imatge:
+      type: object
+      properties:
+        imatge_id:
+          type: integer
+        anunci_id:
+          type: integer
+        filename:
+          type: string
+        ordre:
+          type: integer
+      required:
+      - imatge_id
+      - anunci_id
+      - filename
+      - ordre
+    ImatgesArray:
+      type: array
+      items:
+        $ref: '#/components/schemas/Imatge'
+    Anunci:
+      type: object
+      properties:
+        anunci_id:
+          type: integer
+        usuari_id:
+          type: integer
+        nom:
+          type: string
+        raca:
+          type:
+          - string
+          - 'null'
+        preu:
+          type:
+          - number
+          - 'null'
+        data_naixement:
+          type:
+          - string
+          - 'null'
+          format: date
+        capa:
+          type:
+          - string
+          - 'null'
+        alcada:
+          type:
+          - number
+          - 'null'
+        pes:
+          type:
+          - number
+          - 'null'
+        sexe:
+          type:
+          - string
+          - 'null'
+        lat:
+          type:
+          - number
+          - 'null'
+        lon:
+          type:
+          - number
+          - 'null'
+        destacat:
+          type: boolean
+        estat:
+          type: string
+          enum:
+          - pendent
+          - validat
+          - rebutjat
+        descripcio:
+          type:
+          - string
+          - 'null'
+        creat_el:
+          type:
+          - string
+          - 'null'
+          format: date-time
+        actualitzat_el:
+          type:
+          - string
+          - 'null'
+          format: date-time
+        disciplines:
+          type: array
+          items:
+            type: object
+            properties:
+              nom:
+                type: string
+            required:
+            - nom
+      required:
+      - anunci_id
+      - usuari_id
+      - nom
+      - destacat
+      - estat
+    AnuncisArray:
+      type: array
+      items:
+        $ref: '#/components/schemas/Anunci'
+    AnunciCreate:
+      type: object
+      properties:
+        nom:
+          type: string
+        raca:
+          type:
+          - string
+          - 'null'
+        preu:
+          type:
+          - number
+          - 'null'
+        data_naixement:
+          type:
+          - string
+          - 'null'
+          format: date
+        capa:
+          type:
+          - string
+          - 'null'
+        alcada:
+          type:
+          - number
+          - 'null'
+        pes:
+          type:
+          - number
+          - 'null'
+        sexe:
+          type:
+          - string
+          - 'null'
+        lat:
+          type:
+          - number
+          - 'null'
+        lon:
+          type:
+          - number
+          - 'null'
+        destacat:
+          type: boolean
+          default: false
+        descripcio:
+          type:
+          - string
+          - 'null'
+        disciplines:
+          type: array
+          items:
+            type: integer
+          description: IDs de `disciplines` a associar
+      required:
+      - nom
+    AnunciUpdate:
+      type: object
+      properties:
+        nom:
+          type: string
+        raca:
+          type:
+          - string
+          - 'null'
+        preu:
+          type:
+          - number
+          - 'null'
+        data_naixement:
+          type:
+          - string
+          - 'null'
+          format: date
+        capa:
+          type:
+          - string
+          - 'null'
+        alcada:
+          type:
+          - number
+          - 'null'
+        pes:
+          type:
+          - number
+          - 'null'
+        sexe:
+          type:
+          - string
+          - 'null'
+        lat:
+          type:
+          - number
+          - 'null'
+        lon:
+          type:
+          - number
+          - 'null'
+        destacat:
+          type: boolean
+        descripcio:
+          type:
+          - string
+          - 'null'
+        disciplines:
+          type: array
+          items:
+            type: integer
+          description: Substitueix les disciplines associades pels IDs indicats
+    CanviEstatRequest:
+      type: object
+      properties:
+        estat:
+          type: string
+          enum:
+          - validat
+          - rebutjat
+        motiu:
+          type:
+          - string
+          - 'null'
+          description: Obligatori si `estat` = `rebutjat`
+      required:
+      - estat
+    Revisio:
+      type: object
+      properties:
+        revisio_id:
+          type: integer
+        anunci_id:
+          type: integer
+        usuari_id:
+          type: integer
+        motiu:
+          type:
+          - string
+          - 'null'
+        creat_el:
+          type:
+          - string
+          - 'null'
+          format: date-time
+      required:
+      - revisio_id
+      - anunci_id
+      - usuari_id
+    RevisionsArray:
+      type: array
+      items:
+        $ref: '#/components/schemas/Revisio'
+  parameters:
+    AnunciId:
+      name: id
+      in: path
+      required: true
+      schema:
+        type: integer
+    ImgId:
+      name: imgId
+      in: path
+      required: true
+      schema:
+        type: integer
 paths:
-  # ─────────────────────────────────────────────────────────
-  # USUARIS
-  # Base real al codi: /usuaris (assumit muntat a /api)
-  # ─────────────────────────────────────────────────────────
   /usuaris/whoami:
     get:
-      tags: [Usuaris]
+      tags:
+      - Usuaris
       summary: Retorna l'usuari autenticat
-      security: [{ cookieAuth: [] }]
+      security:
+      - cookieAuth: []
       responses:
-        "200":
-          description: Usuari autenticat
+        '200':
+          description: OK
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Usuari"
-        "401":
+                $ref: '#/components/schemas/Usuari'
+        '401':
           description: No autenticat
           content:
             application/json:
-              schema: { $ref: "#/components/schemas/Error" }
-
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
     put:
-      tags: [Usuaris]
+      tags:
+      - Usuaris
       summary: Actualitza el perfil de l'usuari autenticat
-      security: [{ cookieAuth: [] }]
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema: { $ref: "#/components/schemas/UsuariUpdate" }
-      responses:
-        "200":
-          description: Perfil actualitzat
-          content:
-            application/json:
-              schema: { $ref: "#/components/schemas/Usuari" }
-        "400":
-          description: Sense canvis o usuari inexistent
-          content:
-            application/json:
-              schema: { $ref: "#/components/schemas/Error" }
-        "401":
-          description: No autenticat
-          content:
-            application/json:
-              schema: { $ref: "#/components/schemas/Error" }
-        "500":
-          description: Error servidor
-          content:
-            application/json:
-              schema: { $ref: "#/components/schemas/Error" }
-
-    delete:
-      tags: [Usuaris]
-      summary: Elimina el perfil autenticat i tanca la sessió
-      description: |
-        El backend esborra la sessió de BBDD i expira la cookie `sid`.
-      security: [{ cookieAuth: [] }]
-      responses:
-        "200":
-          description: Eliminat i logout correctes
-          headers:
-            Set-Cookie:
-              description: Expira la cookie de sessió `sid`
-              schema: { type: string }
-          content:
-            application/json:
-              schema: { $ref: "#/components/schemas/OkResponse" }
-        "401":
-          description: No autenticat
-          content:
-            application/json:
-              schema: { $ref: "#/components/schemas/Error" }
-        "404":
-          description: Usuari no trobat
-          content:
-            application/json:
-              schema: { $ref: "#/components/schemas/Error" }
-
-  /usuaris:
-    post:
-      tags: [Usuaris]
-      summary: Crea un usuari
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema: { $ref: "#/components/schemas/UsuariCreate" }
-      responses:
-        "201":
-          description: Usuari creat
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  usuari_id: { type: integer, example: 321 }
-        "400":
-          description: Falten camps o validació
-          content:
-            application/json:
-              schema: { $ref: "#/components/schemas/Error" }
-        "409":
-          description: Correu duplicat
-          content:
-            application/json:
-              schema: { $ref: "#/components/schemas/Error" }
-        "500":
-          description: Error creant usuari
-          content:
-            application/json:
-              schema: { $ref: "#/components/schemas/Error" }
-
-    get:
-      tags: [Usuaris]
-      summary: Llista tots els usuaris (només dades públiques)
-      responses:
-        "200":
-          description: OK
-          content:
-            application/json:
-              schema:
-                type: array
-                items: { $ref: "#/components/schemas/Usuari" }
-        "500":
-          description: Error obtenint usuaris
-          content:
-            application/json:
-              schema: { $ref: "#/components/schemas/Error" }
-
-  /usuaris/{id}:
-    get:
-      tags: [Usuaris]
-      summary: Obté un usuari per ID
-      parameters:
-        - $ref: "#/components/parameters/UsuariIdParam"
-      responses:
-        "200":
-          description: OK
-          content:
-            application/json:
-              schema: { $ref: "#/components/schemas/Usuari" }
-        "404":
-          description: Usuari no trobat
-          content:
-            application/json:
-              schema: { $ref: "#/components/schemas/Error" }
-        "500":
-          description: Error cercant usuari
-          content:
-            application/json:
-              schema: { $ref: "#/components/schemas/Error" }
-
-    put:
-      tags: [Usuaris]
-      summary: Edita un usuari (ADMIN)
-      security: [{ cookieAuth: [] }]
-      parameters:
-        - $ref: "#/components/parameters/UsuariIdParam"
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema: { $ref: "#/components/schemas/UsuariUpdate" }
-      responses:
-        "200":
-          description: Usuari actualitzat
-          content:
-            application/json:
-              schema: { $ref: "#/components/schemas/Usuari" }
-        "404":
-          description: Usuari no trobat o sense canvis
-          content:
-            application/json:
-              schema: { $ref: "#/components/schemas/Error" }
-        "401":
-          description: No autenticat / sense permisos
-          content:
-            application/json:
-              schema: { $ref: "#/components/schemas/Error" }
-        "500":
-          description: Error actualitzant usuari
-          content:
-            application/json:
-              schema: { $ref: "#/components/schemas/Error" }
-
-    delete:
-      tags: [Usuaris]
-      summary: Elimina un usuari (ADMIN)
-      security: [{ cookieAuth: [] }]
-      parameters:
-        - $ref: "#/components/parameters/UsuariIdParam"
-      responses:
-        "200":
-          description: Eliminat correctament
-          content:
-            application/json:
-              schema: { $ref: "#/components/schemas/OkResponse" }
-        "404":
-          description: Usuari no trobat
-          content:
-            application/json:
-              schema: { $ref: "#/components/schemas/Error" }
-        "401":
-          description: No autenticat / sense permisos
-          content:
-            application/json:
-              schema: { $ref: "#/components/schemas/Error" }
-        "500":
-          description: Error eliminant usuari
-          content:
-            application/json:
-              schema: { $ref: "#/components/schemas/Error" }
-
-  /usuaris/login:
-    post:
-      tags: [Usuaris]
-      summary: Inicia sessió (cookie-based)
-      description: |
-        Retorna l'usuari (sense contrassenya) i estableix la cookie de sessió `sid`.
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema: { $ref: "#/components/schemas/LoginRequest" }
-      responses:
-        "200":
-          description: Login correcte
-          headers:
-            Set-Cookie:
-              description: Cookie de sessió `sid`
-              schema: { type: string }
-          content:
-            application/json:
-              schema: { $ref: "#/components/schemas/Usuari" }
-        "400":
-          description: Falten camps
-          content:
-            application/json:
-              schema: { $ref: "#/components/schemas/Error" }
-        "401":
-          description: Credencials incorrectes
-          content:
-            application/json:
-              schema: { $ref: "#/components/schemas/Error" }
-        "403":
-          description: Compte desactivada per administrador
-          content:
-            application/json:
-              schema: { $ref: "#/components/schemas/Error" }
-        "500":
-          description: Error al fer login
-          content:
-            application/json:
-              schema: { $ref: "#/components/schemas/Error" }
-
-  /usuaris/logout:
-    post:
-      tags: [Usuaris]
-      summary: Tanca sessió
-      description: |
-        Esborra la sessió a BBDD i expira la cookie `sid`.
-      responses:
-        "200":
-          description: Logout correcte
-          headers:
-            Set-Cookie:
-              description: Expira la cookie `sid`
-              schema: { type: string }
-          content:
-            application/json:
-              schema: { $ref: "#/components/schemas/OkResponse" }
-        "500":
-          description: Error fent logout
-          content:
-            application/json:
-              schema: { $ref: "#/components/schemas/Error" }
-
-  /usuaris/admin/llistat:
-    get:
-      tags: [Usuaris]
-      summary: Llista d'usuaris (ADMIN) amb filtre d'activitat
-      security: [{ cookieAuth: [] }]
-      parameters:
-        - in: query
-          name: actiu
-          description: Filtra per estat (1 actius, 0 inactius). Si s'omet, retorna tots.
-          schema:
-            type: string
-            enum: ["1", "0"]
-      responses:
-        "200":
-          description: OK
-          content:
-            application/json:
-              schema:
-                type: array
-                items: { $ref: "#/components/schemas/Usuari" }
-        "401":
-          description: No autenticat / sense permisos
-          content:
-            application/json:
-              schema: { $ref: "#/components/schemas/Error" }
-        "500":
-          description: Error obtenint usuaris
-          content:
-            application/json:
-              schema: { $ref: "#/components/schemas/Error" }
-
-  /usuaris/{id}/actiu:
-    patch:
-      tags: [Usuaris]
-      summary: Activa/Desactiva un usuari (ADMIN)
-      security: [{ cookieAuth: [] }]
-      parameters:
-        - $ref: "#/components/parameters/UsuariIdParam"
+      security:
+      - cookieAuth: []
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              type: object
-              required: [actiu]
-              properties:
-                actiu:
-                  description: Estat a aplicar
-                  oneOf:
-                    - type: boolean
-                    - type: integer
-                  examples: [true, 1, 0]
+              $ref: '#/components/schemas/UsuariUpdate'
       responses:
-        "200":
-          description: Estat actualitzat
-          content:
-            application/json:
-              schema: { $ref: "#/components/schemas/Usuari" }
-        "400":
-          description: Falta actiu
-          content:
-            application/json:
-              schema: { $ref: "#/components/schemas/Error" }
-        "401":
-          description: No autenticat / sense permisos
-          content:
-            application/json:
-              schema: { $ref: "#/components/schemas/Error" }
-        "404":
-          description: Usuari no trobat
-          content:
-            application/json:
-              schema: { $ref: "#/components/schemas/Error" }
-        "500":
-          description: Error actualitzant estat
-          content:
-            application/json:
-              schema: { $ref: "#/components/schemas/Error" }
-
-
-paths:
-  /anuncis:
-    get:
-      tags: [Anuncis]
-      summary: Llista d’anuncis
-      description: Llista pública d’anuncis.
-      responses:
-        "200":
-          description: OK
+        '200':
+          description: Perfil actualitzat
           content:
             application/json:
               schema:
-                type: array
-                items: { $ref: "#/components/schemas/Anunci" }
-        "500":
-          description: Error obtenint anuncis
+                $ref: '#/components/schemas/Usuari'
+        '400':
+          description: Sense canvis o camps invàlids
           content:
             application/json:
-              schema: { $ref: "#/components/schemas/Error" }
-
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: No autenticat
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    delete:
+      tags:
+      - Usuaris
+      summary: Elimina el compte de l'usuari autenticat i fa logout
+      security:
+      - cookieAuth: []
+      responses:
+        '200':
+          description: Eliminat i logout
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OkResponse'
+        '401':
+          description: No autenticat
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /usuaris:
     post:
-      tags: [Anuncis]
-      summary: Crea un anunci
-      security: [{ cookieAuth: [] }]
+      tags:
+      - Usuaris
+      summary: Registre d'un nou usuari
       requestBody:
         required: true
         content:
           application/json:
-            schema: { $ref: "#/components/schemas/AnunciCreate" }
+            schema:
+              $ref: '#/components/schemas/UsuariCreate'
       responses:
-        "201":
+        '201':
           description: Creat
           content:
             application/json:
-              schema: { $ref: "#/components/schemas/Anunci" }
-        "401":
-          description: No autenticat
+              schema:
+                $ref: '#/components/schemas/Usuari'
+        '400':
+          description: Camps invàlids o duplicats
           content:
             application/json:
-              schema: { $ref: "#/components/schemas/Error" }
-        "400":
-          description: Error de validació o camps
-          content:
-            application/json:
-              schema: { $ref: "#/components/schemas/Error" }
-        "500":
-          description: Error creant anunci
-          content:
-            application/json:
-              schema: { $ref: "#/components/schemas/Error" }
-
-  /anuncis/{id}:
-    get:
-      tags: [Anuncis]
-      summary: Detall d’un anunci
-      parameters:
-        - in: path
-          name: id
-          required: true
-          schema: { type: integer, minimum: 1 }
-      responses:
-        "200":
-          description: OK
-          content:
-            application/json:
-              schema: { $ref: "#/components/schemas/Anunci" }
-        "404":
-          description: No trobat
-          content:
-            application/json:
-              schema: { $ref: "#/components/schemas/Error" }
-        "500":
-          description: Error
-          content:
-            application/json:
-              schema: { $ref: "#/components/schemas/Error" }
-
-    put:
-      tags: [Anuncis]
-      summary: Actualitza un anunci (propietari o admin)
-      security: [{ cookieAuth: [] }]
-      parameters:
-        - in: path
-          name: id
-          required: true
-          schema: { type: integer, minimum: 1 }
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /usuaris/login:
+    post:
+      tags:
+      - Usuaris
+      summary: Login d'usuari amb cookie de sessió
       requestBody:
         required: true
         content:
           application/json:
-            schema: { $ref: "#/components/schemas/AnunciUpdate" }
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
       responses:
-        "200":
-          description: Actualitzat
+        '200':
+          description: Login correcte
+          headers:
+            Set-Cookie:
+              description: Estableix cookie `sid`
+              schema:
+                type: string
           content:
             application/json:
-              schema: { $ref: "#/components/schemas/Anunci" }
-        "401":
-          description: No autenticat
+              schema:
+                $ref: '#/components/schemas/Usuari'
+        '401':
+          description: Credencials incorrectes
           content:
             application/json:
-              schema: { $ref: "#/components/schemas/Error" }
-        "403":
-          description: No autoritzat (no és propietari ni admin)
-          content:
-            application/json:
-              schema: { $ref: "#/components/schemas/Error" }
-        "404":
-          description: No trobat
-          content:
-            application/json:
-              schema: { $ref: "#/components/schemas/Error" }
-
-    delete:
-      tags: [Anuncis]
-      summary: Elimina un anunci (propietari o admin)
-      security: [{ cookieAuth: [] }]
-      parameters:
-        - in: path
-          name: id
-          required: true
-          schema: { type: integer, minimum: 1 }
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /usuaris/logout:
+    post:
+      tags:
+      - Usuaris
+      summary: Logout (expira cookie `sid`)
       responses:
-        "200":
-          description: Eliminat
+        '200':
+          description: Sessió tancada
+          headers:
+            Set-Cookie:
+              description: Expira cookie `sid`
+              schema:
+                type: string
           content:
             application/json:
-              schema: { $ref: "#/components/schemas/OkResponse" }
-        "401":
-          description: No autenticat
-          content:
-            application/json:
-              schema: { $ref: "#/components/schemas/Error" }
-        "403":
-          description: No autoritzat
-          content:
-            application/json:
-              schema: { $ref: "#/components/schemas/Error" }
-        "404":
-          description: No trobat
-          content:
-            application/json:
-              schema: { $ref: "#/components/schemas/Error" }
-
-  /anuncis/{id}/estat:
-    patch:
-      tags: [Anuncis]
-      summary: Canvia l’estat d’un anunci (ADMIN)
-      security: [{ cookieAuth: [] }]
-      parameters:
-        - in: path
-          name: id
-          required: true
-          schema: { type: integer, minimum: 1 }
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema: { $ref: "#/components/schemas/AnunciEstatPatch" }
-      responses:
-        "200":
-          description: Estat canviat
-          content:
-            application/json:
-              schema: { $ref: "#/components/schemas/Anunci" }
-        "401":
-          description: No autenticat
-          content:
-            application/json:
-              schema: { $ref: "#/components/schemas/Error" }
-        "403":
-          description: No autoritzat (només admin)
-          content:
-            application/json:
-              schema: { $ref: "#/components/schemas/Error" }
-        "404":
-          description: No trobat
-          content:
-            application/json:
-              schema: { $ref: "#/components/schemas/Error" }
-
-  /anuncis/{id}/revisions:
+              schema:
+                $ref: '#/components/schemas/OkResponse'
+  /usuaris/{id}:
     get:
-      tags: [Anuncis]
-      summary: Historial de revisions (ADMIN)
-      security: [{ cookieAuth: [] }]
+      tags:
+      - Usuaris
+      summary: Obté un usuari per id
       parameters:
-        - in: path
-          name: id
-          required: true
-          schema: { type: integer, minimum: 1 }
+      - $ref: '#/components/parameters/AnunciId'
       responses:
-        "200":
+        '200':
           description: OK
           content:
             application/json:
               schema:
-                type: array
-                items: { $ref: "#/components/schemas/RevisioAnunci" }
-        "401":
+                $ref: '#/components/schemas/Usuari'
+        '404':
+          description: No trobat
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    delete:
+      tags:
+      - Usuaris
+      summary: Elimina un usuari per id (ADMIN)
+      security:
+      - cookieAuth: []
+      parameters:
+      - $ref: '#/components/parameters/AnunciId'
+      responses:
+        '200':
+          description: Eliminat
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OkResponse'
+        '401':
           description: No autenticat
           content:
             application/json:
-              schema: { $ref: "#/components/schemas/Error" }
-        "403":
-          description: No autoritzat (només admin)
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Prohibit (no admin)
           content:
             application/json:
-              schema: { $ref: "#/components/schemas/Error" }
-        "500":
-          description: Error obtenint revisions
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: No trobat
           content:
             application/json:
-              schema: { $ref: "#/components/schemas/Error" }
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /perfil:
+    get:
+      tags:
+      - Perfil
+      summary: Retorna el perfil autenticat
+      security:
+      - cookieAuth: []
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Usuari'
+        '401':
+          description: No autenticat
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    put:
+      tags:
+      - Perfil
+      summary: Actualitza dades del perfil
+      security:
+      - cookieAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UsuariUpdate'
+      responses:
+        '200':
+          description: Perfil actualitzat
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Usuari'
+        '400':
+          description: Sense canvis
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: No autenticat
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    delete:
+      tags:
+      - Perfil
+      summary: Esborra el compte i tanca la sessió
+      security:
+      - cookieAuth: []
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OkResponse'
+        '401':
+          description: No autenticat
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /perfil/anuncis:
+    get:
+      tags:
+      - Perfil
+      summary: Llista anuncis de l'usuari autenticat
+      security:
+      - cookieAuth: []
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AnuncisArray'
+        '401':
+          description: No autenticat
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /anuncis:
+    get:
+      tags:
+      - Anuncis
+      summary: Llista anuncis (públic) amb filtres opcionals
+      parameters:
+      - name: raca
+        in: query
+        schema:
+          type: string
+      - name: sexe
+        in: query
+        schema:
+          type: string
+      - name: preu_min
+        in: query
+        schema:
+          type: number
+      - name: preu_max
+        in: query
+        schema:
+          type: number
+      - name: destacat
+        in: query
+        schema:
+          type: boolean
+      - name: estat
+        in: query
+        schema:
+          type: string
+          enum:
+          - pendent
+          - validat
+          - rebutjat
+      - name: disciplina_id
+        in: query
+        schema:
+          type: string
+        description: IDs separats per comes, p.ex. `1,2,3`
+      - name: lat
+        in: query
+        schema:
+          type: number
+      - name: lon
+        in: query
+        schema:
+          type: number
+      - name: radi_km
+        in: query
+        schema:
+          type: number
+        description: Filtra per radi (si es passen lat/lon)
+      - name: ordre
+        in: query
+        schema:
+          type: string
+        description: Criteri d'ordenació (intern, opcional)
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AnuncisArray'
+    post:
+      tags:
+      - Anuncis
+      summary: Crea un anunci (cal login)
+      security:
+      - cookieAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AnunciCreate'
+      responses:
+        '201':
+          description: Creat
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Anunci'
+        '400':
+          description: Camps invàlids
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: No autenticat
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /anuncis/{id}:
+    get:
+      tags:
+      - Anuncis
+      summary: Detall d'un anunci
+      parameters:
+      - $ref: '#/components/parameters/AnunciId'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Anunci'
+        '404':
+          description: No trobat
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    put:
+      tags:
+      - Anuncis
+      summary: Actualitza un anunci (propietari o admin)
+      security:
+      - cookieAuth: []
+      parameters:
+      - $ref: '#/components/parameters/AnunciId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AnunciUpdate'
+      responses:
+        '200':
+          description: Actualitzat
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Anunci'
+        '400':
+          description: Camps invàlids
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: No autenticat
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Prohibit
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: No trobat
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    delete:
+      tags:
+      - Anuncis
+      summary: Esborra un anunci (propietari o admin)
+      security:
+      - cookieAuth: []
+      parameters:
+      - $ref: '#/components/parameters/AnunciId'
+      responses:
+        '200':
+          description: Esborrat
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OkResponse'
+        '401':
+          description: No autenticat
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Prohibit
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: No trobat
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /anuncis/{id}/estat:
+    patch:
+      tags:
+      - Anuncis
+      summary: Canvia l'estat d'un anunci (ADMIN)
+      security:
+      - cookieAuth: []
+      parameters:
+      - $ref: '#/components/parameters/AnunciId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CanviEstatRequest'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OkResponse'
+        '400':
+          description: Peticio invàlida
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: No autenticat
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Prohibit
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: No trobat
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /anuncis/{id}/revisions:
+    get:
+      tags:
+      - Anuncis
+      summary: Llista l'històric de revisions d'un anunci (ADMIN)
+      security:
+      - cookieAuth: []
+      parameters:
+      - $ref: '#/components/parameters/AnunciId'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RevisionsArray'
+        '401':
+          description: No autenticat
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Prohibit
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: No trobat
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /anuncis/{id}/imatges:
+    get:
+      tags:
+      - Imatges
+      summary: Llista imatges d'un anunci
+      parameters:
+      - $ref: '#/components/parameters/AnunciId'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ImatgesArray'
+        '404':
+          description: Anunci no trobat
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    post:
+      tags:
+      - Imatges
+      summary: Puja imatges per a un anunci (propietari o admin)
+      security:
+      - cookieAuth: []
+      parameters:
+      - $ref: '#/components/parameters/AnunciId'
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                files:
+                  type: array
+                  items:
+                    type: string
+                    format: binary
+                  description: Fins a 10 fitxers d'imatge
+              required:
+              - files
+      responses:
+        '201':
+          description: Pujades correctament
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+                  files:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        filename:
+                          type: string
+                        url:
+                          type: string
+                required:
+                - ok
+                - files
+        '400':
+          description: Cap fitxer rebut
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: No autenticat
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Prohibit
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Anunci no trobat
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /anuncis/{id}/imatges/ordre:
+    patch:
+      tags:
+      - Imatges
+      summary: Reordena les imatges d'un anunci
+      security:
+      - cookieAuth: []
+      parameters:
+      - $ref: '#/components/parameters/AnunciId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                type: object
+                properties:
+                  imatge_id:
+                    type: integer
+                  ordre:
+                    type: integer
+                required:
+                - imatge_id
+                - ordre
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OkResponse'
+        '401':
+          description: No autenticat
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Prohibit
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Anunci o imatge no trobats
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /anuncis/{id}/portada:
+    get:
+      tags:
+      - Imatges
+      summary: Redirigeix a la portada (primera imatge) d'un anunci
+      parameters:
+      - $ref: '#/components/parameters/AnunciId'
+      responses:
+        '302':
+          description: Redirect a la URL de la imatge (/uploads/anuncis/{filename})
+        '404':
+          description: No hi ha portada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /anuncis/imatges/{imgId}:
+    delete:
+      tags:
+      - Imatges
+      summary: Esborra una imatge concreta d'un anunci
+      security:
+      - cookieAuth: []
+      parameters:
+      - $ref: '#/components/parameters/ImgId'
+      responses:
+        '200':
+          description: Esborrada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OkResponse'
+        '401':
+          description: No autenticat
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Prohibit
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Imatge no trobada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /disciplines:
+    get:
+      tags:
+      - Disciplines
+      summary: Llista totes les disciplines
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DisciplinesArray'
+  /admin/dashboard:
+    get:
+      tags:
+      - Admin
+      summary: Mètriques bàsiques del panell d'administració
+      security:
+      - cookieAuth: []
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  total_usuaris:
+                    type: integer
+                  total_anuncis:
+                    type: integer
+                required:
+                - total_usuaris
+                - total_anuncis
+        '401':
+          description: No autenticat
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Prohibit (no admin)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
