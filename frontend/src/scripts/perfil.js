@@ -144,7 +144,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             <p class="price">${Number(a.preu).toFixed(2)} €</p>
             <div class="tags">${(a.disciplines||[]).map(d=>`<span class="tag">${d.nom}</span>`).join('')}</div>
 
-            <div class="ad-actions" style="display:flex; gap:.5rem; flex-wrap:wrap; margin-top:.5rem;">
+            <div class="ad-actions">
               <a class="btn-detail"   href="/src/pages/detalls_anuncis.html#id=${a.anunci_id}">Ver detalles</a>
               
               ${a.disponibilitat !== 'venut'? `
@@ -153,8 +153,8 @@ document.addEventListener('DOMContentLoaded', async () => {
               }
 
               ${a.disponibilitat === 'actiu' ? `
-                <button class="btn-danger"  data-action="baixa" data-id="${a.anunci_id}">Dar de baja</button>
-                <button class="btn-primary" data-action="venut" data-id="${a.anunci_id}">Marcar como vendido</button>
+                <button class="btn-warning"  data-action="baixa" data-id="${a.anunci_id}">Dar de baja</button>
+                <button class="btn-danger" data-action="venut" data-id="${a.anunci_id}">Marcar como vendido</button>
                 ` : ''}
               
               <button class="btn-danger" data-action="delete" data-id="${a.anunci_id}">Eliminar anuncio</button>

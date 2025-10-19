@@ -5,15 +5,16 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Area personal</title>
   <link rel="stylesheet" href="/src/assets/index.css"/>
+  <link rel="stylesheet" href="/src/assets/styles_perfil.css"/>
 </head>
-<body>
+<body class="page-profile">
     <header></header>
 
 <main class="wrapper">
   <div class="profile-grid">
     <!-- ESQUERRA: Perfil -->
     <section class="info-block" id="perfil-box">
-      <h1 style="margin-top:0;">Area personal</h1>
+      <h1 class="profile-title">Area personal</h1>
 
       <!-- files en lectura + inputs en línia (amagats) -->
       <div class="field-row">
@@ -62,20 +63,13 @@
 
     <!-- DRETA: Anuncis + Esdeveniments -->
     <section class="right-col">
-      <section class="info-block" style="margin-bottom:1rem;">
+      <section class="info-block">
         <div class="section-head">
           <h2>Mis anuncios</h2>
           <a class="btn-primary" href="/src/pages/crear_anunci.html">Crear anuncio</a>
         </div>
         <div id="meus-anuncis" class="ads-grid"></div>
       </section>
-
-      <div class="info-block">
-        <h2 style="margin-top:0;">Mis esdevenimientos</h2>
-        <div id="meus-esdeveniments">
-          <p>(Aún no hay esdevenimientos)</p>
-        </div>
-      </div>
     </section>
   </div>
 </main>

@@ -49,7 +49,7 @@ document.addEventListener('DOMContentLoaded', async () => {
           <div class="meta">${disc || ''}</div>
         </div>
         <div class="actions">
-          <a class="btn" href="/src/pages/detalls_anuncis.html#id=${a.anunci_id}">Ver</a>
+          <a class="btn-detail" href="/src/pages/detalls_anuncis.html#id=${a.anunci_id}">Ver detalles</a>
           <button class="btn" data-action="validar" data-id="${a.anunci_id}">Validar</button>
           <button class="btn-ghost" data-action="rechazar" data-id="${a.anunci_id}">Rechazar</button>
           <button class="btn-danger" data-action="eliminar" data-id="${a.anunci_id}">Eliminar</button>

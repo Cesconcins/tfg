@@ -21,8 +21,6 @@ document.addEventListener('DOMContentLoaded', async () => {
           <option value="0">No Activos</option>
         </select>
       </label>
-      <button id="u-refresh" class="btn-secondary">Actualizar</button>
-      <button id="u-new" class="btn-primary">Nuevo</button>
     `;
     contUsers.parentElement.insertBefore(toolbar, contUsers);
   }
@@ -32,7 +30,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   const btnUNew    = document.getElementById('u-new');
 
   const badgeUser = (actiu) =>
-    `<span class="badge" style="background:${actiu? '#10b981':'#9ca3af'};">${actiu? 'Activo':'Desactivado'}</span>`;
+    `<span class="badge" style="background:${actiu? '#10b981':'#9ca3af'};">${actiu? 'Activo':'Inactivo'}</span>`;
 
   const rowUserHTML = (u) => {
     const nomComplert = [u.nom, u.cognom].filter(Boolean).join(' ') || '(sin nombre)';
@@ -43,7 +41,7 @@ document.addEventListener('DOMContentLoaded', async () => {
           <h3 class="title" style="display:flex;gap:8px;align-items:center;margin:0;">
             ${nomComplert}
             <span class="badge" style="background:${u.actiu? '#10b981':'#9ca3af'};">
-              ${u.actiu? 'Activo':'Desactivado'}
+              ${u.actiu? 'Activo':'Inactivo'}
             </span>
             ${u.administrador ? '<span class="badge" style="background:#6366f1;">Admin</span>' : ''}
           </h3>
