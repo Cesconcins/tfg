@@ -1,0 +1,79 @@
+/* DETALLS ANUNCI · Estils específics d'aquesta pantalla */
+
+/* Contenidor principal de la pàgina de detalls */
+.details-page { padding: 1.5rem 1rem; }
+.details-container { max-width: 72rem; margin: 0 auto; }
+
+/* ── GALERIA ───────────────────────────────────────────────────────────── */
+.gallery {
+  display: grid;
+  gap: .75rem;
+}
+.gallery-main { position: relative; aspect-ratio: 16/9; background:#f3f4f6; border:1px solid #e5e7eb; border-radius:.5rem; overflow:hidden; }
+.gallery-main img { width:100%; height:100%; object-fit:cover; display:block; }
+.gallery-nav { position:absolute; inset:0; display:flex; justify-content:space-between; align-items:center; padding:0 .5rem; pointer-events:none; }
+.gallery-nav button { pointer-events:auto; border:0; padding:.4rem .6rem; border-radius:.375rem; background:#111827; color:#fff; opacity:.85; cursor:pointer; }
+.gallery-counter { position:absolute; right:.5rem; bottom:.5rem; background:#111827; color:#fff; border-radius:.375rem; padding:.2rem .5rem; font-size:.875rem; opacity:.85; }
+
+
+
+/* ── TÍTOL + BADGE ─────────────────────────────────────────────────────── */
+.title-row {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-top: .5rem; gap: 1rem;
+}
+.title-row h1 {
+  font-size: clamp(1.25rem, 2vw + .75rem, 1.75rem);
+  margin: 0;
+}
+.title-sub { color:#6b7280; font-weight: 500; }
+.featured-badge {
+  background:#111827; color:#fff; border-radius:.375rem;
+  padding:.35rem .6rem; font-weight:600; font-size:.875rem; white-space: nowrap;
+}
+
+/* ── LAYOUT INFERIOR (2 columnes) ──────────────────────────────────────── */
+.details-layout {
+  display: grid; gap: 1rem; margin-top: 1rem;
+  grid-template-columns: 2fr 1fr;
+}
+@media (max-width: 980px){ .details-layout { grid-template-columns: 1fr; } }
+
+.panel {
+  background:#fff; border:1px solid #e5e7eb; border-radius:.5rem;
+  padding:1rem; box-shadow:0 1px 2px rgba(0,0,0,.04);
+}
+
+/* Fitxa de dades ràpides */
+.quick-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0,1fr));
+  gap: .75rem 1rem;
+}
+@media (max-width: 560px){ .quick-grid { grid-template-columns: 1fr; } }
+.kv { display:flex; gap:.5rem; align-items:center; }
+.kv .k { color:#6b7280; min-width: 7rem; font-weight:600; }
+.kv .v { font-weight:600; }
+
+/* Disciplines (reutilitza .tag del CSS base) */
+.disc-wrap { display:flex; flex-wrap:wrap; gap:.35rem; }
+
+/* Descripció */
+.desc p { margin: .5rem 0 0 0; }
+
+/* Targeta contacte venedor */
+.contact-card .name { font-weight:700; font-size:1.05rem; }
+.contact-card .email a { color:#2563eb; text-decoration: none; }
+.contact-card .email a:hover { text-decoration: underline; }
+
+#bloc-dades      { grid-column: 1; grid-row: 1; }
+#bloc-contacte   { grid-column: 1; grid-row: 2; }
+#bloc-desc       { grid-column: 2; grid-row: 1 / span 2; }  /* ← ocupa fins a baix */
+
+/* En mòbil: tornem a una sola columna en el flux natural */
+@media (max-width: 980px){
+  #bloc-dades, #bloc-desc, #bloc-contacte {
+    grid-column: 1 !important;
+    grid-row: auto !important;
+  }
+}

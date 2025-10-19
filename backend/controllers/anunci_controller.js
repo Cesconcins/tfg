@@ -26,6 +26,35 @@ async function detall(req, res) {
   }
 }
 
+async function autor(req, res) {
+  try {
+    const id = Number(req.params.id);
+    if (!Number.isFinite(id)) return res.status(400).json({ error: 'ID invàlid' });
+
+    const [rows] = await pool.query(
+      `SELECT u.usuari_id, u.nom, u.cognom AS cognoms, u.correu_electronic AS email, u.telefon
+         FROM usuaris u
+         JOIN anuncis a ON a.usuari_id = u.usuari_id
+        WHERE a.anunci_id = ?`,
+      [id]
+    );
+    const u = rows && rows[0];
+    if (!u) return res.status(404).json({ error: 'No trobat' });
+
+    // Exposem només dades de contacte bàsiques
+    res.json({
+      usuari_id: u.usuari_id,
+      nom: u.nom,
+      cognoms: u.cognoms,
+      email: u.email
+    });
+  } catch (e) {
+    console.error('[anuncis] Error autor:', e);
+    res.status(500).json({ error: 'Error obtenint el venedor' });
+  }
+}
+
+
 async function crear(req, res) {
   try {
     const uid = req.usuari?.usuari_id;
@@ -176,6 +205,7 @@ async function anunciDestacat(req, res) {
 module.exports = {
   llistar,
   detall,
+  autor,
   crear,
   actualitzar,
   eliminar,

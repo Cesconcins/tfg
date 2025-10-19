@@ -39,7 +39,7 @@ CREATE TABLE `anunci_disciplina` (
 
 LOCK TABLES `anunci_disciplina` WRITE;
 /*!40000 ALTER TABLE `anunci_disciplina` DISABLE KEYS */;
-INSERT INTO `anunci_disciplina` VALUES (1,12),(2,14),(3,13),(4,22),(5,24),(6,16),(7,11),(8,18),(9,13),(9,14),(10,15),(10,23),(25,13),(25,24),(27,15);
+INSERT INTO `anunci_disciplina` VALUES (58,11),(59,14),(60,12),(60,18),(61,19),(63,11);
 /*!40000 ALTER TABLE `anunci_disciplina` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -65,13 +65,17 @@ CREATE TABLE `anuncis` (
   `lon` decimal(9,6) NOT NULL,
   `destacat` tinyint(1) NOT NULL DEFAULT 0,
   `estat` enum('pendent','validat','rebutjat') NOT NULL DEFAULT 'pendent',
+  `disponibilitat` enum('actiu','venut','baixa') NOT NULL DEFAULT 'actiu',
+  `venut_el` datetime DEFAULT NULL,
   `descripcio` text DEFAULT NULL,
   `creat_el` timestamp NOT NULL DEFAULT current_timestamp(),
   `actualitzat_el` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
   PRIMARY KEY (`anunci_id`),
   KEY `usuari_id` (`usuari_id`),
+  KEY `idx_anuncis_validacio` (`estat`),
+  KEY `idx_anuncis_disponibilitat` (`disponibilitat`),
   CONSTRAINT `anuncis_ibfk_1` FOREIGN KEY (`usuari_id`) REFERENCES `usuaris` (`usuari_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=28 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=64 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -80,7 +84,7 @@ CREATE TABLE `anuncis` (
 
 LOCK TABLES `anuncis` WRITE;
 /*!40000 ALTER TABLE `anuncis` DISABLE KEYS */;
-INSERT INTO `anuncis` VALUES (1,1,'Estrella','Pura sang',15000.00,'2015-06-12','tord',1.65,550.00,'femella',41.385100,2.173400,0,'validat','Cursa de pura sang amb bones prestacions.','2025-06-19 22:59:44','2025-06-19 22:59:44'),(2,1,'Rayo','Àrab',12000.00,'2016-03-20','castany',1.60,500.00,'mascle',41.387900,2.169900,0,'validat','Àrab altament resistent, ideal per raids.','2025-06-19 22:59:44','2025-10-10 11:14:40'),(3,1,'Luna','Lusità',18000.00,'2014-11-05','negre',1.62,530.00,'femella',41.388800,2.174000,1,'validat','Excel·lent per doma clàssica i exhibicions.','2025-06-19 22:59:44','2025-10-11 18:28:48'),(4,1,'Trueno','Frís',10000.00,'2017-07-15','tord',1.70,600.00,'mascle castrat',41.386500,2.176000,0,'validat','Frís tranquil, perfecte per passejos de trail.','2025-06-19 22:59:44','2025-10-02 13:03:46'),(5,1,'Sol','Quarter',9000.00,'2018-01-22','castany',1.55,480.00,'femella',41.389000,2.170500,0,'validat','Ideal per competicions western.','2025-06-19 22:59:44','2025-10-10 11:46:26'),(6,1,'Brisa','Andalús',20000.00,'2013-05-30','tord',1.63,540.00,'femella',41.384000,2.175000,1,'rebutjat','Perfecte per voltaig i doma.','2025-06-19 22:59:44','2025-10-02 13:03:48'),(7,1,'Fortuna','Selle Français',14000.00,'2016-09-10','negre',1.68,580.00,'femella',41.386000,2.172000,0,'validat','Ideal per salt d’obstacles.','2025-06-19 22:59:44','2025-10-10 11:47:08'),(8,1,'Trufa','German Sport',13000.00,'2017-12-01','castany',1.66,560.00,'femella',41.387000,2.171000,0,'validat','Molts moviments de doma.','2025-06-19 22:59:44','2025-10-02 13:03:45'),(9,1,'Argos','Pura sang',16000.00,'2015-02-18','tord',1.64,540.00,'mascle',41.385500,2.174500,0,'validat','Espècie única combinant resistència i salt.','2025-06-19 22:59:44','2025-06-19 22:59:44'),(10,1,'Echo','Quarter',11000.00,'2018-08-08','castany',1.57,500.00,'mascle castrat',41.388200,2.169000,0,'rebutjat','Ideal per passejos de trail i raids curts.','2025-06-19 22:59:44','2025-10-10 11:47:48'),(12,1,'Cavall prova direcció OK','Pura sangre',12000.00,'2016-11-24','castany',1.68,540.00,'mascle',41.455060,2.254155,0,'validat','cavall de prova direcció funciona?','2025-09-24 15:18:22','2025-10-10 11:15:18'),(13,1,'cavall jordi','Pura sangre',10004.00,'2020-02-20','Castaño',1.42,489.00,'mascle',41.480742,2.225085,0,'validat','prova jordi','2025-10-02 13:10:00','2025-10-10 10:48:04'),(22,1,'Cavall amb imatge','Arabe',5000.00,'2022-06-23','Castaño',1.52,489.00,'mascle',41.234321,1.696637,0,'validat',NULL,'2025-10-14 01:23:26','2025-10-14 01:23:56'),(25,1,'problema disciplines','Frison',12300.00,'2021-12-02','negro',1.72,568.00,'mascle',41.652488,2.517140,0,'validat',NULL,'2025-10-14 09:57:22','2025-10-14 09:57:50'),(27,1,'prova imatges','prova',1.00,'2025-10-14','Castaño',1.00,1.00,'femella',41.455060,2.254155,0,'validat',NULL,'2025-10-14 10:16:06','2025-10-14 10:16:12');
+INSERT INTO `anuncis` VALUES (58,3,'Fulgor','Caballo de deporte español',14000.00,'2016-07-08','Castaño',1.68,560.00,'femella',41.455060,2.254155,1,'validat','actiu',NULL,'Yegua con muy buena actitud para salto. Facilita la mano y no mira obstáculos.','2025-10-19 03:15:09','2025-10-19 04:00:06'),(59,3,'Bendito','Cruzado',5000.00,'2014-09-14','Alazán',1.58,500.00,'mascle',41.656381,2.508041,0,'validat','actiu',NULL,'Caballo súper dócil, perfecto para rutas y iniciación. Vive en paddock, fácil de manejar y herrar.','2025-10-19 03:18:24','2025-10-19 03:29:18'),(60,3,'Nerón','Lusitano',9000.00,'2020-02-18','Negro',1.60,520.00,'mascle castrat',41.234782,1.678362,0,'validat','actiu',NULL,'Lusitano joven con muy buenas aptitudes, caminador y con buenos aires. Aún en trabajo de base.','2025-10-19 03:21:26','2025-10-19 03:29:20'),(61,15,'Miel','Poni shetland',1200.00,'2019-07-10','Palomino',1.05,180.00,'femella',41.258729,-0.799471,1,'validat','actiu',NULL,'Poni ideal para niños, muy tranquila. Acostumbrada a cepillado y paseos a la mano.','2025-10-19 03:23:52','2025-10-19 04:00:11'),(62,15,'Rayo','Anglo-árabe',8000.00,'2015-11-23','Castaño',1.66,540.00,'mascle castrat',37.250141,-3.549672,0,'validat','actiu',NULL,'Caballo rápido y valiente, experiencia en raid ligero y campo.','2025-10-19 03:26:18','2025-10-19 03:29:20'),(63,1,'Rayo','Pura sangre',9000.00,'2018-09-08','Castaño',1.64,515.00,'mascle castrat',42.122089,1.841814,0,'pendent','actiu',NULL,'Pura sangre para salto de obstáculos; valiente, ágil, respetuoso con el palo, manejable y competitivo.','2025-10-19 13:26:21','2025-10-19 13:26:21');
 /*!40000 ALTER TABLE `anuncis` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -126,7 +130,7 @@ CREATE TABLE `imatge_anunci` (
   KEY `idx_img_anunci` (`anunci_id`),
   KEY `idx_img_ordre` (`anunci_id`,`ordre`),
   CONSTRAINT `fk_img_anunci` FOREIGN KEY (`anunci_id`) REFERENCES `anuncis` (`anunci_id`) ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=17 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -135,7 +139,7 @@ CREATE TABLE `imatge_anunci` (
 
 LOCK TABLES `imatge_anunci` WRITE;
 /*!40000 ALTER TABLE `imatge_anunci` DISABLE KEYS */;
-INSERT INTO `imatge_anunci` VALUES (2,22,'2b9754fd-5392-41cd-8a6c-83ba35f72c89.webp',0,'2025-10-14 03:23:26'),(4,25,'8e124d32-90c7-4113-8320-ba18a594bb5d.jpg',0,'2025-10-14 11:57:22'),(5,27,'319515cb-c22b-4c38-a5e1-0e75d6f4e85c.jpg',0,'2025-10-14 12:16:06'),(6,27,'e7a0a2da-2323-4b93-aef6-c3b6eb2aefa7.webp',1,'2025-10-14 12:16:06');
+INSERT INTO `imatge_anunci` VALUES (10,58,'9ade17ea-9fc7-44c9-9d3e-b8288c5e46d1.jpg',0,'2025-10-19 05:15:09'),(11,59,'0c1ad840-3b8f-4521-babc-098cb9a256f0.jpg',0,'2025-10-19 05:18:24'),(12,59,'b421b0e5-3802-4553-baf1-b9cadf1b130a.jpg',1,'2025-10-19 05:18:24'),(13,60,'130e1ba1-1a06-4c18-a69c-7b94c8ec9a91.jpg',0,'2025-10-19 05:21:26'),(14,61,'a5221c73-d099-417e-a2df-8d9ef3843a15.jpg',0,'2025-10-19 05:23:52'),(15,62,'7ae540bc-081b-4796-a5d3-ef9b10e367ba.jpg',0,'2025-10-19 05:26:18'),(16,63,'cb8dd3b7-2f45-4806-b59b-2b5cfab40cf3.jpg',0,'2025-10-19 15:26:21');
 /*!40000 ALTER TABLE `imatge_anunci` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -158,7 +162,7 @@ CREATE TABLE `revisio_anunci` (
   KEY `idx_rev_creat` (`creat_el`),
   CONSTRAINT `fk_rev_anunci` FOREIGN KEY (`anunci_id`) REFERENCES `anuncis` (`anunci_id`) ON DELETE CASCADE,
   CONSTRAINT `fk_rev_usuari` FOREIGN KEY (`usuari_id`) REFERENCES `usuaris` (`usuari_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=14 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=20 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -167,7 +171,7 @@ CREATE TABLE `revisio_anunci` (
 
 LOCK TABLES `revisio_anunci` WRITE;
 /*!40000 ALTER TABLE `revisio_anunci` DISABLE KEYS */;
-INSERT INTO `revisio_anunci` VALUES (1,2,1,NULL,'2025-10-10 13:14:40'),(2,12,1,NULL,'2025-10-10 13:15:18'),(3,5,1,NULL,'2025-10-10 13:46:26'),(4,7,1,NULL,'2025-10-10 13:47:08'),(5,10,1,'No cumple con las normas de la plataforma','2025-10-10 13:47:48'),(6,3,1,NULL,'2025-10-11 20:28:48'),(10,22,1,NULL,'2025-10-14 03:23:56'),(12,25,1,NULL,'2025-10-14 11:57:50'),(13,27,1,NULL,'2025-10-14 12:16:12');
+INSERT INTO `revisio_anunci` VALUES (15,58,1,NULL,'2025-10-19 05:29:15'),(16,59,1,NULL,'2025-10-19 05:29:18'),(17,60,1,NULL,'2025-10-19 05:29:20'),(18,61,1,NULL,'2025-10-19 05:29:20'),(19,62,1,NULL,'2025-10-19 05:29:20');
 /*!40000 ALTER TABLE `revisio_anunci` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -196,7 +200,7 @@ CREATE TABLE `sessions` (
 
 LOCK TABLES `sessions` WRITE;
 /*!40000 ALTER TABLE `sessions` DISABLE KEYS */;
-INSERT INTO `sessions` VALUES ('0d8829a6-88fb-4614-ab61-399d77efa582',1,'2025-09-11 11:55:29','2025-09-18 11:55:29'),('258bcde6-e074-4dcf-b688-f93b930490cd',1,'2025-10-10 13:07:32','2025-10-17 13:07:32'),('3bf87c3e-6177-499b-9f1a-d6dc1d25ed2f',1,'2025-09-19 16:06:10','2025-09-26 16:06:10'),('5653eb95-a113-4c6c-8379-13e031eb84b7',1,'2025-09-19 16:06:19','2025-09-26 16:06:19'),('56b9e3b7-c85d-4251-82ab-5ded62d8dc45',1,'2025-09-22 07:52:09','2025-09-29 07:52:09'),('5774746a-5e1f-41c1-96e5-1f99bb3aa18b',1,'2025-09-19 16:32:51','2025-09-26 16:32:51'),('9d4ec219-c3ee-4b3a-817d-e63b034e0350',1,'2025-09-08 11:45:27','2025-09-15 11:45:27'),('ad50e4fc-3feb-41e9-854f-55b21eef0a6d',1,'2025-09-19 16:32:10','2025-09-26 16:32:10'),('fa673c76-a640-45b0-8f57-d884fa2094ea',1,'2025-09-19 16:32:20','2025-09-26 16:32:20'),('ffde651d-c540-4e50-a451-40e4e3f5a471',1,'2025-10-14 13:26:32','2025-10-21 13:26:32');
+INSERT INTO `sessions` VALUES ('0d8829a6-88fb-4614-ab61-399d77efa582',1,'2025-09-11 11:55:29','2025-09-18 11:55:29'),('258bcde6-e074-4dcf-b688-f93b930490cd',1,'2025-10-10 13:07:32','2025-10-17 13:07:32'),('3bf87c3e-6177-499b-9f1a-d6dc1d25ed2f',1,'2025-09-19 16:06:10','2025-09-26 16:06:10'),('5653eb95-a113-4c6c-8379-13e031eb84b7',1,'2025-09-19 16:06:19','2025-09-26 16:06:19'),('56b9e3b7-c85d-4251-82ab-5ded62d8dc45',1,'2025-09-22 07:52:09','2025-09-29 07:52:09'),('5774746a-5e1f-41c1-96e5-1f99bb3aa18b',1,'2025-09-19 16:32:51','2025-09-26 16:32:51'),('9d4ec219-c3ee-4b3a-817d-e63b034e0350',1,'2025-09-08 11:45:27','2025-09-15 11:45:27'),('ad50e4fc-3feb-41e9-854f-55b21eef0a6d',1,'2025-09-19 16:32:10','2025-09-26 16:32:10'),('c040f3bc-ae1e-4821-ba2d-0aae33b3c84a',1,'2025-10-19 13:26:56','2025-10-26 14:26:56'),('e70b2d8f-9244-4e8d-a59c-5bb4ab24fef3',14,'2025-10-16 18:18:34','2025-10-23 18:18:34'),('fa673c76-a640-45b0-8f57-d884fa2094ea',1,'2025-09-19 16:32:20','2025-09-26 16:32:20');
 /*!40000 ALTER TABLE `sessions` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -221,7 +225,7 @@ CREATE TABLE `usuaris` (
   PRIMARY KEY (`usuari_id`),
   UNIQUE KEY `correu_electronic` (`correu_electronic`),
   UNIQUE KEY `uq_telefon` (`telefon`)
-) ENGINE=InnoDB AUTO_INCREMENT=14 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=16 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -230,17 +234,9 @@ CREATE TABLE `usuaris` (
 
 LOCK TABLES `usuaris` WRITE;
 /*!40000 ALTER TABLE `usuaris` DISABLE KEYS */;
-INSERT INTO `usuaris` VALUES (1,1,1,'Admin','Admin','999999999','admin@root.com','admin','2025-05-22 18:31:39','2025-10-10 13:06:02'),(3,0,1,'francesco','oncins spedo','644324461','francesco@gmail.com','2134','2025-09-11 10:45:05','2025-09-12 14:32:05'),(11,0,0,'prova2','prova','123123123','prova2@gmail.com','prova','2025-09-11 11:05:02','2025-10-14 14:35:33');
+INSERT INTO `usuaris` VALUES (1,1,1,'Admin','Admin','999999999','admin@root.com','admin','2025-05-22 18:31:39','2025-10-10 13:06:02'),(3,0,1,'francesco','oncins spedo','644324461','francesco@gmail.com','2134','2025-09-11 10:45:05','2025-09-12 14:32:05'),(14,0,1,'Pau','Alcázar','121212121','pau@gmail.com','Pau123','2025-10-16 18:18:27','2025-10-19 03:30:54'),(15,0,1,'Jordi','Garcia','','jordi.garcia@upc.edu','1234','2025-10-19 02:31:15','2025-10-19 02:31:15');
 /*!40000 ALTER TABLE `usuaris` ENABLE KEYS */;
 UNLOCK TABLES;
-
---
--- Dumping events for database 'cavalls_db'
---
-
---
--- Dumping routines for database 'cavalls_db'
---
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
@@ -251,4 +247,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2025-10-16 16:54:56
+-- Dump completed on 2025-10-19 16:12:54

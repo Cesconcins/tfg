@@ -1,0 +1,90 @@
+/* ANUNCIS · Estils específics de la pàgina de llistat d'anuncis */
+
+/* Layout de la pàgina d'anuncis */
+.listing-page { padding: 2rem 1rem; }
+.listing-grid { display: grid; grid-template-columns: 280px 1fr; gap: 1rem; }
+@media (max-width: 900px){ .listing-grid { grid-template-columns: 1fr; } }
+
+/* Panell de filtres (lateral) */
+.filters-title { margin: 0 0 .75rem 0; }
+.filter-group { margin-bottom: 1rem; }
+.filter-group .label { display:block; font-weight:600; margin-bottom:.25rem; }
+.filter-group label { display:block; font-weight:600; margin-bottom:.5rem; }
+.filter-group input[type="text"],
+.filter-group input[type="number"],
+.filter-group select {
+  /* Inputs coherents amb l’estètica general */
+  width:100%;
+  padding:.55rem .7rem;
+  border:1px solid #d1d5db;
+  border-radius:.375rem;
+  box-sizing:border-box;
+}
+.filter-group input[type="range"]{ width:100%; }
+.check-inline { display:inline-flex; align-items:center; gap:.35rem; font-weight:500; margin-right:.75rem; }
+.hint { display:block; color:#6b7280; margin-top:.25rem; }
+
+/* Disposició de grups a dues columnes quan hi ha parelles de camps */
+.grid-2 { display:grid; grid-template-columns: 1fr 1fr; gap:.5rem .75rem; }
+@media (max-width: 520px){ .grid-2 { grid-template-columns: 1fr; } }
+
+/* Accions del formulari de filtres */
+.filter-actions { display:flex; gap:.5rem; }
+
+/* Graella de targetes de resultats */
+.ads-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.5rem;
+  margin: 2rem 0;
+}
+@media (max-width: 900px) { .ads-grid { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 600px) { .ads-grid { grid-template-columns: 1fr; } }
+
+/* Targeta vertical d'anunci (vista d'anuncis) */
+.card-anunci {
+  background:#fff;
+  border:1px solid #e5e7eb;
+  border-radius:.5rem;
+  overflow:hidden;
+  display:flex;
+  flex-direction:column;
+  box-shadow:0 1px 2px rgba(0,0,0,.04);
+}
+
+/* Imatge superior + badge "Destacado" sobreposat */
+.card-anunci .card-img { position:relative; }
+.card-anunci .card-img img {
+  width: 100%;
+  height: auto;
+  object-fit: cover;
+  display: block;
+}
+.card-anunci .card-img .badge {
+  position:absolute; top:.5rem; left:.5rem;
+  background:#111827; color:#fff; padding:.25rem .5rem; border-radius:.375rem;
+  font-size:.875rem;
+}
+
+/* Cos de la targeta */
+.card-body { padding: 1rem; display:flex; flex-direction:column; gap:.5rem; }
+.card-body h3 { margin: 0; font-size:1.1rem; }
+.card-body .sub { margin:0; color:#6b7280; }        /* raca/capa en color suau */
+.card-body .price { font-weight:700; }              /* preu destacat */
+.card-body .dist { color:#374151; }                 /* distància (si n'hi ha) */
+.card-body .btn-detail { display:inline-block; margin-top:.25rem; }
+
+/* Llista de propietats dins la targeta (coherent amb la principal) */
+.card-props{
+  list-style:none;
+  margin:.25rem 0 .25rem;
+  padding:0;
+  display:grid;
+  grid-template-columns: 1fr 1fr;
+  gap:.5rem 1rem;
+}
+@media (max-width: 520px){ .card-props{ grid-template-columns: 1fr; } }
+
+/* Reutilitza els tags de disciplines definits al CSS base:
+   .prop-disciplines .tag { ... } (ja és a index.css)
+*/

@@ -3,7 +3,7 @@ const path = require('path');
 const express = require('express');
 const cors = require('cors');
 
-// const mountDocs = require('./docs');
+const mountDocs = require('./docs');
 const usuarisRuta = require('./rutes/rutes_usuaris');
 const anuncisRuta = require('./rutes/rutes_anuncis');
 const perfilRuta = require('./rutes/rutes_perfil');
@@ -19,7 +19,7 @@ app.use(cors({
 }));
 app.use(express.json());
 
-// mountDocs(app);
+mountDocs(app);
 
 app.use('/uploads', express.static(path.join(__dirname, '../frontend/public/uploads/anuncis')));
 app.use('/', express.static(path.join(__dirname, '../frontend/public')));

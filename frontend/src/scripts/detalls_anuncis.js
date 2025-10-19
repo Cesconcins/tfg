@@ -1,118 +1,192 @@
-document.addEventListener('DOMContentLoaded', async () => {
-  const cont = document.getElementById('detall-cont');
+// src/scripts/detalls_anuncis.js
+// Galeria bàsica (anar endavant/enrere + fletxes del teclat)
+// i dades del venedor (lectura robusta i missatge en castellà)
 
-  // Llegeix id de ?id=... o de #id=...
+document.addEventListener('DOMContentLoaded', () => {
+  const main  = document.getElementById('galeria-main');
+  const title = document.getElementById('title-row');
+  const dades = document.getElementById('bloc-dades');
+  const desc  = document.getElementById('bloc-desc');
+  const cont  = document.getElementById('bloc-contacte');
+  if (!main || !title || !dades || !desc || !cont) return; // hooks definits a l'HTML actual
+
+  const BASE_API = 'http://localhost:3001';
+
+  // ── Helpers ────────────────────────────────────────────────────────────
   function getAdId() {
-    // 1) query
-    const qsId = new URLSearchParams(location.search).get('id');
-    if (qsId) return qsId;
-    // 2) hash
+    const q = new URLSearchParams(location.search).get('id');
+    if (q) return q;
     const raw = location.hash.startsWith('#') ? location.hash.slice(1) : location.hash;
-    const h = new URLSearchParams(raw);
-    return h.get('id');
+    return new URLSearchParams(raw).get('id');
   }
 
-  const id = getAdId();
-  console.log('[detalls] id=', id); // debug
-
-  if (!id) {
-    cont.innerHTML = '<p>No se ha especificado ningún anuncio.</p>';
-    return;
+  function calculateAge(dnaStr) {
+    if (!dnaStr) return null;
+    const dna = new Date(dnaStr), now = new Date();
+    let age = now.getFullYear() - dna.getFullYear();
+    const tmp = new Date(dna); tmp.setFullYear(now.getFullYear());
+    if (tmp > now) age--;
+    return age;
   }
 
-  try {
-    const r = await fetch(`http://localhost:3001/anuncis/${id}`, { credentials: 'include' });
-    if (!r.ok) throw new Error('No se pudo cargar el anuncio');
-    const a = await r.json();
-    // Map de sexe (BBDD en català -> UI en castellà)
-    const sexoES = (() => {
-      const v = (a.sexe || '').toLowerCase();
-      if (v === 'mascle') return 'Macho';
-      if (v === 'femella') return 'Hembra';
-      if (v === 'mascle castrat') return 'Macho castrado';
-      return '';
-    })();
-    cont.innerHTML = `
-      <article class="detail-card">
-        <div class="detail-img">
-          <img src="http://localhost:3001/anuncis/${a.anunci_id}/portada" alt="Foto ${a.nom}" style="max-width:100%;border-radius:.5rem;">
-        </div>
-        <div class="detail-body">
-          <h2 style="margin-top:.5rem;">${a.nom || 'Sin nombre'}</h2>
-          <p class="sub">${[a.raca || '', sexoES].filter(Boolean).join(' · ')}</p>
-          ${a.preu != null ? `<p class="price" style="font-weight:600;">${Number(a.preu).toFixed(2)} €</p>` : ''}
-          ${a.data_naixement ? `<p>Año de nacimiento: ${(new Date(a.data_naixement)).getFullYear()}</p>` : ''}
-          ${a.alcada != null ? `<p>Alzada: ${a.alcada} m</p>` : ''}
-          ${a.pes != null ? `<p>Peso: ${a.pes} kg</p>` : ''}
-          ${a.capa ? `<p>Capa: ${a.capa}</p>` : ''}
-          <p>${a.descripcio ? a.descripcio : ''}</p>
-          ${(a.disciplines||[]).length
-            ? `<div class="tags">${a.disciplines.map(d=>`<span class="tag">${d.nom}</span>`).join('')}</div>`
-            : ''
-          }
-          ${a.lat!=null && a.lon!=null ? `<p>Ubicación: ${a.lat.toFixed(5)}, ${a.lon.toFixed(5)}</p>` : ''}
-        </div>
-      </article>
-    `;
-      
-    const BASE_API = 'http://localhost:3001';
-    const urls = (a.imatges && a.imatges.length) ? a.imatges.map(im => `${BASE_API}${im.url}`): [`${BASE_API}/anuncis/${a.anunci_id}/portada`];
-    const wrap = cont.querySelector('.detail-img');
-    addImageCarousel(wrap, urls);
-    
-
-  } catch (e) {
-    console.error(e);
-    cont.innerHTML = '<p>Error cargando el anuncio.</p>';
+  // BBDD en català → UI castellà (només tres casos)
+  function formatSexCATtoES(val) {
+    if (val == null) return '—';
+    const v = String(val).trim().toLowerCase().replace(/\s+/g,' ');
+    if (v === 'mascle') return 'Macho';
+    if (v === 'mascle castrat') return 'Macho castrado';
+    if (v === 'femella') return 'Hembra';
+    return '—';
   }
 
-  // Crea un mini carrusel sobre la imatge existent
-  function addImageCarousel(imgWrapEl, urls) {
-    if (!imgWrapEl || !Array.isArray(urls) || urls.length === 0) return;
+  function disciplinesTags(arr){
+    const L = Array.isArray(arr) ? arr : [];
+    if (!L.length) return '—';
+    return L.map(d => `<span class="tag">${(d && d.nom) ? d.nom : String(d)}</span>`).join('');
+  }
 
-    // agafa la <img> que ja existeix al markup
-    const img = imgWrapEl.querySelector('img');
-    if (!img) return;
+  async function fetchJSON(url){
+    const r = await fetch(url, { credentials: 'include' });
+    if (!r.ok) throw new Error(`${r.status} ${r.statusText}`);
+    return r.json();
+  }
 
-    // estat intern
+  // ── Galeria bàsica (sense miniatures) ──────────────────────────────────
+  function renderGallery(urls, a){
+    // Fallback dur: portada si no hi ha llista d’imatges
+    if (!Array.isArray(urls) || urls.length === 0) {
+      urls = [`${BASE_API}/anuncis/${a.anunci_id}/portada`];
+    }
+
     let i = 0;
-    const setSrc = () => { img.src = urls[i]; };
-
-    // només una imatge → no calen fletxes
-    if (urls.length === 1) { setSrc(); return; }
-
-    // construeix botons
-    const mkBtn = (txt) => {
-      const b = document.createElement('button');
-      b.type = 'button';
-      b.textContent = txt;
-      b.style.cssText = `
-        position:absolute; top:50%; transform:translateY(-50%);
-        background:rgba(0,0,0,.55); color:#fff; border:none; cursor:pointer;
-        width:36px; height:36px; border-radius:999px; font-size:16px; line-height:36px;
+    const setImg = () => {
+      // HTML minimal: imatge + botons prev/next + comptador
+      main.innerHTML = `
+        <img src="${urls[i]}" alt="Foto ${a.nom || ''}">
+        <div class="gallery-nav">
+          <button type="button" aria-label="Anterior" data-nav="prev">◀</button>
+          <button type="button" aria-label="Siguiente" data-nav="next">▶</button>
+        </div>
+        <div class="gallery-counter">${i+1}/${urls.length}</div>
       `;
-      return b;
+
+      const prev = main.querySelector('[data-nav="prev"]');
+      const next = main.querySelector('[data-nav="next"]');
+      prev.addEventListener('click', () => { i = (i - 1 + urls.length) % urls.length; setImg(); });
+      next.addEventListener('click', () => { i = (i + 1) % urls.length; setImg(); });
     };
 
-    imgWrapEl.style.position = 'relative';
-    const prev = mkBtn('◀'); prev.style.left  = '8px';
-    const next = mkBtn('▶'); next.style.right = '8px';
-    imgWrapEl.appendChild(prev);
-    imgWrapEl.appendChild(next);
-
-    // handlers
-    prev.addEventListener('click', () => { i = (i - 1 + urls.length) % urls.length; setSrc(); });
-    next.addEventListener('click', () => { i = (i + 1) % urls.length; setSrc(); });
-
-    // navegació amb teclat (opcional)
-    imgWrapEl.tabIndex = 0;
-    imgWrapEl.addEventListener('keydown', (e) => {
-      if (e.key === 'ArrowLeft')  prev.click();
-      if (e.key === 'ArrowRight') next.click();
+    // Suport teclat
+    window.addEventListener('keydown', (e) => {
+      if (urls.length <= 1) return;
+      if (e.key === 'ArrowLeft')  { i = (i - 1 + urls.length) % urls.length; setImg(); }
+      if (e.key === 'ArrowRight') { i = (i + 1) % urls.length; setImg(); }
     });
 
-    // arrencada
-    setSrc();
+    setImg();
   }
 
+  // ── Títol ──────────────────────────────────────────────────────────────
+  function renderTitle(a){
+    const breedLine = [a.raca, a.capa].filter(Boolean).join(' ');
+    title.innerHTML = `
+      <div>
+        <h1>${a.nom || ''}</h1>
+        <div class="title-sub">${breedLine}</div>
+      </div>
+      ${a.destacat ? '<span class="featured-badge">🏅 Destacado</span>' : '<span></span>'}
+    `;
+  }
+
+  // ── Dades ràpides + Descripció ─────────────────────────────────────────
+  function renderDades(a){
+    const age  = calculateAge(a.data_naixement);
+    const sexe = formatSexCATtoES(a.sexe);
+    const preu = (a.preu!=null) ? `${Number(a.preu).toFixed(2)} €` : '—';
+
+    const rows = [
+      ['Precio', preu],
+      ['Sexo', sexe],
+      ['Edad', age!=null ? `${age} años` : '—'],
+      a.alcada != null ? ['Alzada', `${a.alcada} cm`] : null,
+      a.pes    != null ? ['Peso', `${a.pes} kg`] : null,
+      ['Disciplinas', `<div class="disc-wrap">${disciplinesTags(a.disciplines||[])}</div>`],
+      a.localitat || a.provincia ? ['Ubicación', [a.localitat, a.provincia].filter(Boolean).join(', ')] : null
+    ].filter(Boolean);
+
+    dades.innerHTML = `
+      <h3>Información principal</h3>
+      <div class="quick-grid">
+        ${rows.map(([k,v]) => `
+          <div class="kv"><div class="k">${k}</div><div class="v">${v}</div></div>
+        `).join('')}
+      </div>
+    `;
+  }
+
+  function renderDesc(a){
+    const txt = a.descripcio?.trim();
+    desc.innerHTML = `
+      <h3>Descripción</h3>
+      ${txt ? `<p>${txt}</p>` : `<p>El anunciante no ha añadido ninguna descripción.</p>`}
+    `;
+  }
+
+  // ── Contacte (castellà) ────────────────────────────────────────────────
+  function renderContacte(autor){
+    if (!autor) {
+      cont.innerHTML = `<h3>Contacto</h3><p>No se ha podido obtener la información del vendedor.</p>`;
+      return;
+    }
+    const nombre    = autor.nom || autor.nombre || '';
+    const apellidos = autor.cognoms || autor.apellidos || '';
+    const nomCompl  = [nombre, apellidos].filter(Boolean).join(' ');
+    const email     = autor.email || autor.correu || autor.correo || '';
+
+    cont.innerHTML = `
+      <h3>Contacto</h3>
+      <div class="name">${nomCompl || '—'}</div>
+      <div class="email">${email ? `<a href="mailto:${email}">${email}</a>` : '—'}</div>
+    `;
+  }
+
+  // ── Flux principal ─────────────────────────────────────────────────────
+  (async function init(){
+    const id = getAdId();
+    if (!id) { main.innerHTML = '<p>Falta el identificador del anuncio.</p>'; return; }
+
+    try {
+      // 1) Dades de l'anunci
+      const a = await fetchJSON(`${BASE_API}/anuncis/${id}`);
+
+      // 2) Imatges: usa a.imatges (si hi ha) o la portada
+      let urls = [];
+      if (Array.isArray(a.imatges) && a.imatges.length) {
+        urls = a.imatges.map(im => {
+          const raw = (im && typeof im === 'object') ? im.url : im;
+          return String(raw).startsWith('http') ? raw : `${BASE_API}${raw}`;
+        });
+      } else {
+        urls = [`${BASE_API}/anuncis/${a.anunci_id}/portada`];
+      }
+
+      // 3) Autor: prova camp inclòs o endpoint dedicat
+      let autor = a.usuari || a.user || a.autor || null;
+      if (!autor) {
+        try { autor = await fetchJSON(`${BASE_API}/anuncis/${id}/autor`); }
+        catch { /* si falla, es mostrarà l’error en renderContacte */ }
+      }
+
+      // Render
+      renderGallery(urls, a);
+      renderTitle(a);
+      renderDades(a);
+      renderDesc(a);
+      renderContacte(autor);
+
+    } catch (e) {
+      console.error(e);
+      main.innerHTML = '<p>Error cargando el anuncio.</p>';
+    }
+  })();
 });

@@ -40,14 +40,6 @@ h2                      { margin-top:0; }
   vertical-align:middle;
 }
 
-
-.ads-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 1.5rem;
-  margin: 2rem 0;
-}
-
 /* mida i ajust de la imatge */
 .card-img img {
   width: 100%;
@@ -67,26 +59,6 @@ h2                      { margin-top:0; }
 .card-body {
   padding: 1rem;
   flex: 1; /* que ocupi tot l’espai restant */
-}
-
-@media (max-width: 900px) {
-  .ads-grid {
-    grid-template-columns: repeat(2, 1fr);
-  }
-  .ads-grid .card-img img {
-    width: 100%;
-  }
-}
-
-/* Mòbils */
-/* Quan la finestra < 600px, 1 sola columna */
-@media (max-width: 600px) {
-  .ads-grid {
-    grid-template-columns: 1fr;
-  }
-  .ads-grid .card-img img {
-    width: 100%;
-  }
 }
 
 /* Imatge dins les cards del sidebar */
@@ -221,31 +193,6 @@ h2                      { margin-top:0; }
 
 .geocoder .mapboxgl-ctrl-geocoder { max-width: 100%; }
 .mini-map { height: 260px; border: 1px solid #e5e7eb; border-radius: .5rem; margin-top: .5rem; }
-
-
-/* Layout pàgina d'anuncis */
-.listing-page { padding: 2rem 1rem; }
-.listing-grid { display: grid; grid-template-columns: 280px 1fr; gap: 1rem; }
-@media (max-width: 900px){ .listing-grid { grid-template-columns: 1fr; } }
-
-/* Panell filtres */
-.filters-title { margin: 0 0 .75rem 0; }
-.filter-group { margin-bottom: 1rem; }
-.filter-group .label { display:block; font-weight:600; margin-bottom:.25rem; }
-.filter-group label { display:block; font-weight:600; margin-bottom:.5rem; }
-.filter-group input[type="text"],
-.filter-group input[type="number"],
-.filter-group select {
-  width:100%; padding:.55rem .7rem; border:1px solid #d1d5db; border-radius:.375rem; box-sizing:border-box;
-}
-.filter-group input[type="range"]{ width:100%; }
-.check-inline { display:inline-flex; align-items:center; gap:.35rem; font-weight:500; margin-right: .75rem; }
-.hint { display:block; color:#6b7280; margin-top:.25rem; }
-
-.grid-2 { display:grid; grid-template-columns: 1fr 1fr; gap:.5rem .75rem; }
-@media (max-width: 520px){ .grid-2 { grid-template-columns: 1fr; } }
-
-.filter-actions { display:flex; gap:.5rem; }
 
 .list-vertical{ display:flex; flex-direction:column; gap:16px; }
 

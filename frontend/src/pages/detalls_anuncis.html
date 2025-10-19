@@ -5,14 +5,33 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Detalle del anuncio</title>
   <link rel="stylesheet" href="/src/assets/index.css"/>
+  <link rel="stylesheet" href="/src/assets/styles_detalls_anuncis.css"/>
 </head>
 <body>
   <header></header>
 
-  <main class="wrapper">
-    <h1>Detalles del anuncio</h1>
-    <div id="detall-cont" class="info-block">Cargando…</div>
-  </main>
+<main class="wrapper details-page">
+  <div class="details-container">
+    <!-- GALERIA -->
+    <section id="galeria" class="gallery">
+      <div class="gallery-main" id="galeria-main"></div>
+    </section>
+
+    <!-- TÍTOL + BADGE -->
+    <section class="title-row" id="title-row"></section>
+
+    <!-- CONTINGUT INFERIOR -->
+    <section class="details-layout">
+      <!-- Columna esquerra -->
+      <div class="panel" id="bloc-dades"></div>
+      <div class="panel desc" id="bloc-desc"></div>
+
+      <!-- Columna dreta -->
+      <aside class="panel contact-card" id="bloc-contacte"></aside>
+    </section>
+  </div>
+</main>
+
 
   <footer></footer>
 

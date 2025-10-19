@@ -40,7 +40,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       <article class="row-card" data-id="${a.anunci_id}">
         <img class="thumb" src="http://localhost:3001/anuncis/${a.anunci_id}/portada" alt="Foto ${a.nom}">
         <div>
-          <span class="badge badge-destacat" style="${a.destacat ? '' : 'display:none;'}">🏅 Destacat</span>
+          <span class="badge badge-destacat" style="${a.destacat ? '' : 'display:none;'}">🏅 Destacado</span>
           <h3 class="title" style="display:flex;gap:8px;align-items:center;margin:0;">
             ${a.nom || 'Sin nombre'}
             ${badge(a.estat)}
