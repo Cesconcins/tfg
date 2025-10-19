@@ -6,6 +6,7 @@
         <title>Plataforma Caballos · Mapa</title>
 
         <link rel="stylesheet" href="../src/assets/index.css" />
+        <link rel="stylesheet" href="../src/assets/mapa_styles.css" />
         <link rel="stylesheet" href="https://api.mapbox.com/mapbox-gl-js/v2.13.0/mapbox-gl.css" />
     </head>
 
@@ -16,26 +17,25 @@
             <template id="card-template">
                 <article class="card-anunci card--row">
                         <!-- ESQUERRA -->
-                        <div class="card-left">
-                            <h3 class="card-title"></h3>
-                            <img class="card-img" src="" alt="">
+                    <h3 class="card-title"></h3>
+                    <div class="card-left">
+                        <img class="card-img" src="" alt="">
+                        <div class="card-badge-wrap">
+                            <span class="badge card-badge hidden">🏅 Destacado</span>
                         </div>
+                    </div>
 
-                        <!-- DRETA -->
-                        <div class="card-right">
-                            <div class="card-top">
-                                <span class="badge card-badge hidden">🏅 Destacado</span>
-                            </div>
+                    <!-- DRETA -->
+                    <div class="card-right">
+                        <ul class="card-props">
+                            <li><strong>Disciplinas:</strong> <span class="prop-disciplines"></span></li>
+                            <li><strong>Edad:</strong> <span class="prop-edad"></span></li>
+                            <li class="li-dist" style="display:none;"><strong>Distancia:</strong> <span class="prop-dist"></span></li>
+                            <li><strong>Precio:</strong> <span class="prop-precio"></span></li>
+                        </ul>
 
-                            <ul class="card-props">
-                                <li><strong>Raza:</strong> <span class="prop-raza"></span></li>
-                                <li><strong>Edad:</strong> <span class="prop-edad"></span></li>
-                                <li><strong>Precio:</strong> <span class="prop-precio"></span></li>
-                                <li><strong>Disciplinas:</strong> <span class="prop-disciplines"></span></li>
-                            </ul>
-
-                            <a href="#" class="btn-detail">Ver detalles</a>
-                        </div>
+                        <a href="#" class="btn-detail">Ver detalles</a>
+                    </div>
                 </article>
             </template>
         </main>

@@ -10,8 +10,8 @@ const anunciController = require('../controllers/anunci_controller');
 
 
 // Públic
-router.get('/',     ctrl.llistar);
-router.get('/:id',  ctrl.detall);
+router.get('/', ctrl.llistar);
+router.get('/:id', ctrl.detall);
 
 // Crea (cal login)
 router.post('/',    auth, ctrl.crear);

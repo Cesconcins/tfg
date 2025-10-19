@@ -1,4 +1,3 @@
-// controllers/anunci_controller.js
 const pool    = require('../config/db');
 const model   = require('../models/anunci_model');
 const filtres = require('../middlewares/filtres_anuncis');

@@ -1,0 +1,102 @@
+/* ---- Estils específics pàgina mapa (index) ---- */
+.map-container          { height:100vh; width:100%; flex-grow:2; }
+.map                    { height:100%; }
+
+.map-sidebar { display:flex; gap:1rem; }
+.map-sidebar .map-container { flex:7; }
+.map-sidebar .sidebar {
+  flex:3;
+  max-height: calc(100vh - 4rem);
+  overflow-y:auto;
+  padding:.5rem;
+  border:1px solid #ddd;
+  border-radius:.5rem;
+}
+
+/* targetes dins el sidebar del mapa */
+.sidebar .card-anunci { margin-bottom:1rem; }
+.sidebar .card-img img {
+  width:50%; height:160px; object-fit:cover; display:block; border-bottom:1px solid #eee;
+}
+
+/* Botó per tornar al mapa (si el fas servir) */
+.map-toggle-btn {
+  position:absolute; bottom:1rem; left:50%; transform:translateX(-50%);
+  background: rgba(255,255,255,0.9); border:none; padding:.5rem 1rem; cursor:pointer;
+  font:inherit; border-radius:.25rem; box-shadow:0 2px 6px rgba(0,0,0,.2); color:inherit;
+}
+.map-toggle-btn:hover { background:#fff; }
+
+/* Contenidor d’anuncis amb botó flotant cap al mapa */
+.ads-wrapper { position:relative; min-height:300px; }
+.ads-wrapper #ad-to-map { position:absolute; bottom:1rem; left:50%; transform:translateX(-50%); }
+
+/* Popups del mapa (index) */
+.mapboxgl-popup-content img { max-width:100%; height:auto; display:block; }
+
+.card-anunci{
+  background:#fff; border:1px solid #e5e7eb; border-radius:.5rem; overflow:hidden; padding:.75rem;
+}
+
+/* Grid amb franja superior pel títol */
+.card--row{
+  display:grid;
+  grid-template-columns: 260px 1fr;
+  grid-template-areas:
+    "title title"
+    "media info";
+  gap: 1rem;
+}
+
+.card-title{
+  grid-area: title;
+  margin: .25rem 0 .25rem;
+  font-size: 1.1rem;
+  font-weight: 700;
+}
+
+/* Columna esquerra: imatge + badge a sota */
+.card-left{ grid-area: media; display:flex; flex-direction:column; gap:.5rem; }
+.card-img{ width:100%; height:160px; object-fit:cover; border-radius:.5rem; display:block; }
+.card-badge-wrap{ margin-top:.35rem; }
+.badge.card-badge{ position:static; background:#111827; color:#fff; }
+
+/* Columna dreta: info centrada verticalment (lleu desplaçament cap avall si vols) */
+.card-right{
+  grid-area: info;
+  display:flex; flex-direction:column; justify-content:center; gap:.5rem;
+  padding-top: .25rem; /* ajust fi opcional */
+}
+
+/* Propietats */
+.card-props{
+  list-style:none; margin:.25rem 0 1rem; padding:0;
+  display:grid; grid-template-columns: 1fr 1fr; gap:.5rem 1rem;
+}
+.prop-disciplines .tag{
+  display:inline-block; background:#eef2ff; color:#1e3a8a;
+  padding:.15rem .4rem; border-radius:.35rem;
+  margin-right:.25rem; margin-bottom:.25rem; font-size:.85rem;
+}
+
+/* Responsive */
+@media (max-width: 520px){
+  .card--row{
+    grid-template-columns: 1fr;
+    grid-template-areas:
+      "title"
+      "media"
+      "info";
+  }
+  .card-props{ grid-template-columns: 1fr; }
+  .card-right{ justify-content: flex-start; }
+}
+
+/* Responsive del layout del mapa */
+@media (max-width:768px){
+  .map-sidebar { flex-direction:column; }
+  .map-sidebar .map-container { order:1; height:52vh; min-height:320px; }
+  .map-sidebar .sidebar { order:2; max-height:none; height:auto; overflow:visible; border:0; padding:0; }
+  .sidebar .card-anunci { margin-bottom:.75rem; }
+  .sidebar .card-img img { width:100%; height:180px; }
+}
