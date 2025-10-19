@@ -91,9 +91,9 @@ Crea el fitxer `backend/.env` amb els valors d’entorn:
 ```dotenv
 DB_HOST=localhost
 DB_PORT=3306
-DB_USER=Jordi
-DB_PASS=JordiGarciaUPC
-DB_NAME=cavalls_db
+DB_USER=username
+DB_PASS=password
+DB_NAME=name_of_database
 APP_PORT=3001
 ```
 
