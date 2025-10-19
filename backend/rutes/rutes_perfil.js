@@ -13,7 +13,8 @@ router.get('/anuncis', auth, async (req, res) => {
     try {
         const uid = req.usuari.usuari_id;
         const [rows] = await pool.query(
-            `SELECT a.anunci_id, a.nom, a.preu, a.descripcio, a.destacat, a.data_naixement, a.raca, a.lat, a.lon
+            `SELECT a.anunci_id, a.nom, a.preu, a.descripcio, a.destacat, a.data_naixement,
+            a.raca,a.lat, a.lon, a.estat, a.disponibilitat, a.venut_el
             FROM anuncis a
             WHERE a.usuari_id = ?
             ORDER BY a.creat_el DESC`,

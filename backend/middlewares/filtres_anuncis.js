@@ -7,8 +7,8 @@ function buildListQuery(q) {
   let select = `
     SELECT
       a.anunci_id, a.usuari_id, a.nom, a.raca, a.preu, a.data_naixement,
-      a.capa, a.alcada, a.pes, a.sexe, a.lat, a.lon,
-      a.destacat, a.estat, a.creat_el, a.actualitzat_el,
+      a.capa, a.alcada, a.pes, a.sexe, a.lat, a.lon, a.destacat,
+      a.estat, a.disponibilitat, a.venut_el, a.creat_el, a.actualitzat_el,
       GROUP_CONCAT(DISTINCT d.nom ORDER BY d.nom SEPARATOR ',') AS disciplines_txt
     FROM anuncis a
     LEFT JOIN anunci_disciplina ad ON ad.anunci_id = a.anunci_id
@@ -18,7 +18,7 @@ function buildListQuery(q) {
   // ─────────────────────────────────────────────────────────────
   // ESTAT
   // Públic (per defecte): només validats.
-  // Admin (sense canviar controladors): si arriba ?all=1 o ?estat=..., no forcem 'validat'.
+  // Admin (sense canviar controladors): si arriba ?all=1 o ?estat=..., no es força 'validat'.
   const isAll = q.all === '1' || q.all === 1 || q.all === true;
   const estatQ = typeof q.estat === 'string' ? q.estat.trim() : '';
   const estatValid = ['pendent','validat','rebutjat','eliminat'].includes(estatQ);
@@ -32,6 +32,16 @@ function buildListQuery(q) {
     params.push(estatQ);
   }
   // si ?all=1 → sense filtre d'estat
+
+  // ─────────────────────────────────────────────────────────────
+  // DISPONIBILITAT
+  const dispQ = (q.disponibilitat ?? '').toString().trim();
+  const disponibilitatValida = ['actiu','venut','baixa'].includes(dispQ);
+  if (!isAll && !disponibilitatValida) {
+    where.push(`a.disponibilitat = 'actiu'`);
+  } else if (disponibilitatValida) {
+    where.push('a.disponibilitat = ?'); params.push(dispQ);
+  }
 
   // ─────────────────────────────────────────────────────────────
   // TEXTUALS
@@ -88,15 +98,15 @@ function buildListQuery(q) {
   }
 
   // ─────────────────────────────────────────────────────────────
-  // Haversine (radi)
+  // Radi
   const lat0 = buildNumber(q.lat), lon0 = buildNumber(q.lon), radi = buildNumber(q.radi_km);
   let orderParts = [];
   if (lat0 != null && lon0 != null && radi != null) {
     select = `
       SELECT
         a.anunci_id, a.usuari_id, a.nom, a.raca, a.preu, a.data_naixement,
-        a.capa, a.alcada, a.pes, a.sexe, a.lat, a.lon,
-        a.destacat, a.estat, a.creat_el, a.actualitzat_el,
+        a.capa, a.alcada, a.pes, a.sexe, a.lat, a.lon, a.destacat,
+        a.estat, a.disponibilitat, a.venut_el, a.creat_el, a.actualitzat_el,
         GROUP_CONCAT(DISTINCT d.nom ORDER BY d.nom SEPARATOR ',') AS disciplines_txt,
         ( 6371 * ACOS(
             COS(RADIANS(?)) * COS(RADIANS(a.lat)) *
@@ -151,7 +161,6 @@ function buildListQuery(q) {
     }
   }
 
-  // ─────────────────────────────────────────────────────────────
   const limit  = Number(q.limit || 60);
   const offset = Number(q.offset || 0);
 

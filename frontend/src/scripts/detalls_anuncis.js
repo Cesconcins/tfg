@@ -21,10 +21,17 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
 
   try {
-    const r = await fetch(`http://localhost:3001/anuncis/${id}`);
+    const r = await fetch(`http://localhost:3001/anuncis/${id}`, { credentials: 'include' });
     if (!r.ok) throw new Error('No se pudo cargar el anuncio');
     const a = await r.json();
-
+    // Map de sexe (BBDD en català -> UI en castellà)
+    const sexoES = (() => {
+      const v = (a.sexe || '').toLowerCase();
+      if (v === 'mascle') return 'Macho';
+      if (v === 'femella') return 'Hembra';
+      if (v === 'mascle castrat') return 'Macho castrado';
+      return '';
+    })();
     cont.innerHTML = `
       <article class="detail-card">
         <div class="detail-img">
@@ -32,7 +39,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         </div>
         <div class="detail-body">
           <h2 style="margin-top:.5rem;">${a.nom || 'Sin nombre'}</h2>
-          <p class="sub">${a.raca || ''} · ${a.sexe || ''}</p>
+          <p class="sub">${[a.raca || '', sexoES].filter(Boolean).join(' · ')}</p>
           ${a.preu != null ? `<p class="price" style="font-weight:600;">${Number(a.preu).toFixed(2)} €</p>` : ''}
           ${a.data_naixement ? `<p>Año de nacimiento: ${(new Date(a.data_naixement)).getFullYear()}</p>` : ''}
           ${a.alcada != null ? `<p>Alzada: ${a.alcada} m</p>` : ''}
@@ -47,11 +54,12 @@ document.addEventListener('DOMContentLoaded', async () => {
         </div>
       </article>
     `;
-
+      
     const BASE_API = 'http://localhost:3001';
     const urls = (a.imatges && a.imatges.length) ? a.imatges.map(im => `${BASE_API}${im.url}`): [`${BASE_API}/anuncis/${a.anunci_id}/portada`];
     const wrap = cont.querySelector('.detail-img');
     addImageCarousel(wrap, urls);
+    
 
   } catch (e) {
     console.error(e);

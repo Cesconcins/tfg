@@ -40,6 +40,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       <article class="row-card" data-id="${a.anunci_id}">
         <img class="thumb" src="http://localhost:3001/anuncis/${a.anunci_id}/portada" alt="Foto ${a.nom}">
         <div>
+          <span class="badge badge-destacat" style="${a.destacat ? '' : 'display:none;'}">🏅 Destacat</span>
           <h3 class="title" style="display:flex;gap:8px;align-items:center;margin:0;">
             ${a.nom || 'Sin nombre'}
             ${badge(a.estat)}
@@ -48,10 +49,11 @@ document.addEventListener('DOMContentLoaded', async () => {
           <div class="meta">${disc || ''}</div>
         </div>
         <div class="actions">
-          <a class="btn" href="/src/pages/detalls_anuncis.html?id=${a.anunci_id}">Ver</a>
-          <button class="btn"        data-action="validar"  data-id="${a.anunci_id}">Validar</button>
-          <button class="btn-ghost"  data-action="rechazar" data-id="${a.anunci_id}">Rechazar</button>
+          <a class="btn" href="/src/pages/detalls_anuncis.html#id=${a.anunci_id}">Ver</a>
+          <button class="btn" data-action="validar" data-id="${a.anunci_id}">Validar</button>
+          <button class="btn-ghost" data-action="rechazar" data-id="${a.anunci_id}">Rechazar</button>
           <button class="btn-danger" data-action="eliminar" data-id="${a.anunci_id}">Eliminar</button>
+          <button class="btn-secondary" data-action="toggle-destacat" data-id="${a.anunci_id}" data-on="${a.destacat ? 1 : 0}"> ${a.destacat ? 'Quitar destacado' : 'Destacar'}</button>
         </div>
       </article>
     `;
@@ -142,6 +144,35 @@ document.addEventListener('DOMContentLoaded', async () => {
           console.error('Eliminar error:', msg);
         }
         await carregar();
+        return;
+      }
+
+      if (acc === 'toggle-destacat') {
+        const on   = btn.getAttribute('data-on') === '1';
+        const want = !on;
+
+        const resp = await fetch(`${BASE_API}/anuncis/${id}/destacat`, {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'include',
+          body: JSON.stringify({ destacat: want })
+        });
+
+        if (!resp.ok) {
+          let msg = `HTTP ${resp.status}`;
+          try { const j = await resp.json(); if (j?.error) msg += ` · ${j.error}`; } catch {}
+          console.error('Destacar error:', msg);
+          return;
+        }
+
+        // Actualitza UI immediatament
+        btn.setAttribute('data-on', want ? '1' : '0');
+        btn.textContent = want ? 'Quitar destacado' : 'Destacar';
+
+        const card  = btn.closest('.row-card');
+        const badge = card?.querySelector('.badge-destacat');
+        if (badge) badge.style.display = want ? '' : 'none';
+
         return;
       }
     } catch (e) {

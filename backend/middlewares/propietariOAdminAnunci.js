@@ -4,7 +4,7 @@ module.exports = async function propietariOAdmin(req, res, next) {
   try {
     const id = req.params.id;
     const [rows] = await pool.query(
-      'SELECT anunci_id, usuari_id, estat FROM anuncis WHERE anunci_id = ?',
+      'SELECT anunci_id, usuari_id, estat, disponibilitat FROM anuncis WHERE anunci_id = ?',
       [id]
     );
     const a = rows[0];

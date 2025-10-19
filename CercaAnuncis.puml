@@ -1,65 +1,76 @@
 @startuml
-title Cercar anuncis amb filtres (MVC)
+title Diagrama de seqüpència del Cas d'Ús · Cercar anuncis amb filtres
 
 actor Usuari
-boundary "Vista anuncis" as Vista
-entity "Mapbox Geocoding" as Mapbox
-control "Router anuncis\nbackend/rutes/rutes_anuncis.js" as Router
-control "AnunciController.llistar\nbackend/controllers/anunci_controller.js" as Controller
-control "FiltresAnuncis.llistarAmbFiltres\nbackend/middlewares/filtres_anuncis.js" as Filtres
-database "MySQL (pool)\nbackend/config/db.js" as DB
+
+box "Vista (Frontend)"
+  boundary "Vista anuncis" as Vista
+  control "Filters UI" as FiltersUI
+end box
+
+box "Controlador (Backend)"
+  control "Router anuncis" as Router
+  control "AnunciController" as Controller
+  control "Filtres middleware" as Filtres
+end box
+
+box "Model"
+  entity "AnunciModel" as Model
+  database "Base de Dades" as DB
+end box
+
+entity "Mapbox API" as Mapbox
 
 note over Usuari,Vista
-Precondició: filtres (raça, preu, ubicació…) són vàlids.
+Precondició: filtres (raça, preu, ubicació…) vàlids.
 Sense ubicació → no es calcula distància.
 end note
 
-Usuari -> Vista : Omple formulari i envia
+Usuari -> Vista : Selecciona filtres
 activate Vista
-Vista -> Vista : buildParams()
-alt Filtre amb ubicació
-  Vista -> Mapbox : geocode(municipi|província)
-  Mapbox --> Vista : lat/lon
-  Vista -> Vista : Afegeix lat/lon i radi
+Vista -> FiltersUI : Envia formulari
+activate FiltersUI
+
+alt Ubicació proporcionada
+  FiltersUI -> Mapbox : geocode(municipi | província)
+  Mapbox --> FiltersUI : lat/lon
+  FiltersUI -> FiltersUI : Afegeix coordenades i radi
 else Sense ubicació
-  Vista -> Vista : Manté filtres sense distància
+  FiltersUI -> FiltersUI : Manté filtres sense distància
 end
-Vista -> Vista : dispatch filters:changed
-Vista -> Router : GET /anuncis?filtres
+
+FiltersUI -> FiltersUI : buildParams()
+FiltersUI -> Router : GET /anuncis?filtres
+deactivate FiltersUI
 deactivate Vista
 
 activate Router
-Router -> Controller : llistar(req.query)
+Router -> Controller : llistar(query)
 activate Controller
-Controller -> Filtres : llistarAmbFiltres(pool, query)
+Controller -> Filtres : prepararConsulta(query)
 activate Filtres
-Filtres -> Filtres : buildListQuery(query)
-note right of Filtres
-Aplica estat=validat per públic,
-text, rangs i disciplines.
-Si hi ha lat/lon → Haversine i ORDER BY distància.
-Per defecte: destacat DESC, creat_el DESC.
-LIMIT/OFFSET per paginació.
-end note
-Filtres -> DB : pool.query(sql, params)
+Filtres -> Model : buildListQuery(query)
+activate Model
+Model -> DB : SELECT anuncis filtrats
 activate DB
-DB --> Filtres : files d'anuncis
+DB --> Model : files d'anuncis
 deactivate DB
-Filtres -> Filtres : postProcess(disciplines)
-Filtres --> Controller : llista ordenada i paginada
+Model --> Filtres : resultats + metadades
+deactivate Model
+
+Filtres -> Controller : llista ordenada
 deactivate Filtres
-Controller --> Router : JSON anuncis
+Controller --> Router : HTTP 200 + JSON anuncis
 deactivate Controller
-Router --> Vista : 200 OK + llista
-deactivate Router 
+Router --> Vista : Resposta JSON
+deactivate Router
 
 activate Vista
-Vista -> Vista : Renderitza targetes destacat/distància
-Vista --> Usuari : Mostra llista d'anuncis
+Vista -> FiltersUI : Renderitza targetes
+FiltersUI --> Usuari : Mostra resultat paginat
 deactivate Vista
 
 note over Vista,Usuari
-Resultat: llista paginada d'anuncis validats,
-ordenada per destacat i distància si disponible.
+Resultat: anuncis validats ordenats per destacat i distància (si disponible).
 end note
 @enduml

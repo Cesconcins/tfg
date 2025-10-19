@@ -11,8 +11,12 @@ document.addEventListener('DOMContentLoaded', async () => {
   const okBox = document.getElementById('form-ok');
   const selDisc = document.getElementById('sel-disciplines');
 
-  const params = new URLSearchParams(location.search);
-  const id = params.get('id'); // si hi és → edició
+  const id = (() => {
+    const q = new URLSearchParams(location.search).get('id');
+    if (q) return q;
+    const raw = location.hash.startsWith('#') ? location.hash.slice(1) : location.hash;
+    return new URLSearchParams(raw).get('id');
+  })();
 
   let DISC_LIST = [];
 
@@ -40,8 +44,9 @@ document.addEventListener('DOMContentLoaded', async () => {
       L.forEach(im => {
         const card = document.createElement('div');
         card.style.position = 'relative';
+        const src = im.url?.startsWith('http') ? im.url : `${BASE}${im.url}`;
         card.innerHTML = `
-          <img src="${im.url}" alt="" style="width:100%;height:100px;object-fit:cover;border-radius:.5rem;">
+          <img src="${src}" alt="" style="width:100%;height:100px;object-fit:cover;border-radius:.5rem;">
           <button data-del="${im.imatge_id}" class="btn-danger"
             style="position:absolute;top:6px;right:6px;padding:.25rem .4rem;font-size:.8rem;border-radius:.4rem;">×</button>
         `;
@@ -56,31 +61,56 @@ document.addEventListener('DOMContentLoaded', async () => {
   // 2) Si és edició, carrega l’anunci i preomple
   async function loadAnunciIfEditing() {
     if (!id) return;
-    const r = await fetch(`http://localhost:3001/anuncis/${id}`, { credentials:'include' });
+
+    // Títol del formulari: Crear → Editar
+    const titleE1 = document.getElementById('form-title') || document.querySelector('h1, h2');
+    if (titleE1) titleE1.textContent = 'Editar Anuncio';
+
+    const r = await fetch(`http://localhost:3001/anuncis/${id}`, { credentials: 'include' });
     if (!r.ok) throw new Error('No se pudo cargar el anuncio');
     const a = await r.json();
 
-    form.nom.value = a.nom || '';
-    form.raca.value = a.raca || '';
-    form.preu.value = a.preu ?? '';
-    if (a.data_naixement) form.data_naixement.value = a.data_naixement.slice(0,10);
-    form.capa.value = a.capa || '';
-    form.alcada.value = a.alcada ?? '';
-    form.pes.value = a.pes ?? '';
-    form.sexe.value = a.sexe || '';
-    form.lat.value = a.lat ?? '';
-    form.lon.value = a.lon ?? '';
-    form.descripcio.value = a.descripcio || '';
-
-    // preselecciona disciplines
-    // backend sol retornar a.disciplines com [{nom: '...'}] (sense id)
-    const nomsSel = (a.disciplines || []).map(d => d.nom);
-    const idsSel = DISC_LIST
-      .filter(d => nomsSel.includes(d.nom))
-      .map(d => String(d.disciplina_id));
-    for (const opt of selDisc.options) {
-      opt.selected = idsSel.includes(opt.value);
+    // Helper per omplir per name o id (accepta variants de nom)
+    function setVal(names, v) {
+      const arr = Array.isArray(names) ? names : [names];
+      for (const n of arr) {
+        const el = form.elements[n]
+          || form.querySelector(`[name="${n}"]`)
+          || form.querySelector(`#${n}`);
+        if (el) { el.value = (v ?? '') + ''; return; }
+      }
     }
+
+    setVal(['nom','nombre'], a.nom);
+    setVal(['raca','raza'], a.raca);
+    setVal(['preu','precio'], a.preu);
+    setVal(['data_naixement','fecha_nacimiento'], a.data_naixement ? a.data_naixement.slice(0,10) : '');
+    setVal(['capa'], a.capa);
+    setVal(['alcada','altura'], a.alcada);
+    setVal(['pes','peso'], a.pes);
+    setVal(['sexe','sexo'], a.sexe);
+    setVal(['descripcio','descripcion'], a.descripcio);
+
+    // lat/lon ocults (els controla el geocoder/marker; no mostrar a l’usuari)
+    setVal('lat', a.lat);
+    setVal('lon', a.lon);
+
+    // Destacat (si existeix al formulari)
+    if (form.elements.destacat) form.elements.destacat.checked = !!a.destacat;
+
+    // Preselecció de disciplines (a.disciplines = [{nom}])
+    if (selDisc && selDisc.options && Array.isArray(DISC_LIST)) {
+      const nomsSel = (a.disciplines || []).map(d => d.nom);
+      const idsSel = DISC_LIST
+        .filter(d => nomsSel.includes(d.nom))
+        .map(d => String(d.disciplina_id));
+      for (const opt of selDisc.options) {
+        opt.selected = idsSel.includes(opt.value);
+      }
+    }
+
+    // Carrega galeria d’imatges existents
+    await loadImages(id);
   }
 
   try {
@@ -244,6 +274,9 @@ document.addEventListener('DOMContentLoaded', async () => {
           // no parem el flow; només informem
         }
       }
+
+      // Missatge d’èxit segons acció
+      okBox.textContent = id ? 'Anuncio modificado (pendiente de validación).' : 'Anuncio creado (pendiente de validación).';
 
       okBox.classList.remove('hidden');
       setTimeout(() => location.href = '/src/pages/perfil.html', 700);

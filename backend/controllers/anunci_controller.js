@@ -134,11 +134,53 @@ async function canviarEstat(req, res) {
   }
 }
 
+async function canviarDisponibilitat(req, res) {
+  try {
+    const id = Number(req.params.id);
+    const disp = String(req.body?.disponibilitat || '').trim();
+    if (!['actiu','venut','baixa'].includes(disp)) {
+      return res.status(400).json({ error: 'disponibilitat invàlida' });
+    }
+    const ok = await model.canviarDisponibilitat(id, disp);
+    if (!ok) return res.status(404).json({ error: 'No trobat' });
+    res.json({ ok: true });
+  } catch (e) {
+    console.error('[anuncis] canviarDisponibilitat error:', e);
+    res.status(500).json({ error: 'Error canviant disponibilitat' });
+  }
+}
+
+async function anunciDestacat(req, res) {
+  try {
+    const admin = req.usuari;
+    if (!admin || Number(admin.administrador) !== 1) {
+      return res.status(403).json({ error: 'Només administradors' });
+    }
+    const id = Number(req.params.id);
+    if (!Number.isFinite(id)) return res.status(400).json({ error: 'ID invàlid' });
+
+    const raw = req.body?.destacat;
+    const val = raw === true || raw === 1 || raw === '1' || raw === 'true';
+
+    const ok = await model.anunciDestacat(id, val);
+    if (!ok) return res.status(404).json({ error: 'No trobat' });
+
+    // Opcional: retorna l’anunci actualitzat
+    const a = await model.obtenirPerId(id);
+    res.json(a);
+  } catch (e) {
+    console.error('[anuncis] anunciDestacat error:', e);
+    res.status(500).json({ error: 'Error canviant destacat' });
+  }
+}
+
 module.exports = {
   llistar,
   detall,
   crear,
   actualitzar,
   eliminar,
-  canviarEstat
+  canviarEstat,
+  canviarDisponibilitat,
+  anunciDestacat
 };

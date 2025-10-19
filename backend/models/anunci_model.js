@@ -13,7 +13,7 @@ function normalize(a) {
 async function llistar() {
   const [rows] = await pool.query(`
     SELECT anunci_id, usuari_id, nom, raca, preu, data_naixement,
-           capa, alcada, pes, sexe, lat, lon, destacat, estat, descripcio,
+           capa, alcada, pes, sexe, lat, lon, destacat, estat, disponibilitat, descripcio,
            creat_el, actualitzat_el
     FROM anuncis
     ORDER BY creat_el DESC
@@ -35,7 +35,7 @@ async function llistar() {
 async function obtenirPerId(id) {
   const [[a]] = await pool.query(`
     SELECT anunci_id, usuari_id, nom, raca, preu, data_naixement,
-           capa, alcada, pes, sexe, lat, lon, destacat, estat, descripcio,
+           capa, alcada, pes, sexe, lat, lon, destacat, estat, disponibilitat, descripcio,
            creat_el, actualitzat_el
     FROM anuncis
     WHERE anunci_id = ?
@@ -72,16 +72,18 @@ async function crear(usuari_id, body) {
   try {
     await conn.beginTransaction();
     const estat = 'pendent'; // nou anunci → pendent de validació
+    const disponibilitat = 'actiu'; // valor per defecte en crear
 
-    const [res] = await pool.execute(`
+
+    const [res] = await conn.execute(`
       INSERT INTO anuncis
         (usuari_id, nom, raca, preu, data_naixement, capa, alcada, pes, sexe,
-        lat, lon, destacat, estat, descripcio)
-      VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)
+        lat, lon, destacat, estat, disponibilitat, descripcio)
+      VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
     `, [
       usuari_id, nom, raca, preu, data_naixement || null,
       capa || null, alcada || null, pes || null, sexe || null,
-      lat || null, lon || null, !!destacat, estat, descripcio || null
+      lat || null, lon || null, !!destacat, estat, disponibilitat, descripcio || null
     ]);
 
     const anunciId = res.insertId;
@@ -145,11 +147,33 @@ async function canviarEstat(id, nouEstat) {
   return r.affectedRows > 0;
 }
 
+async function canviarDisponibilitat(id, novaDisp) {
+  // 'venut' posa timestamp; la resta l'esborra
+  const sql = `
+    UPDATE anuncis
+       SET disponibilitat = ?,
+           venut_el = (CASE WHEN ? = 'venut' THEN CURRENT_TIMESTAMP ELSE NULL END),
+           actualitzat_el = CURRENT_TIMESTAMP
+     WHERE anunci_id = ?`;
+  const [r] = await pool.execute(sql, [novaDisp, novaDisp, id]);
+  return r.affectedRows > 0;
+}
+
+async function anunciDestacat(id, val) {
+  const [r] = await pool.execute(
+    'UPDATE anuncis SET destacat = ?, actualitzat_el = CURRENT_TIMESTAMP WHERE anunci_id = ?',
+    [val ? 1 : 0, id]
+  );
+  return r.affectedRows > 0;
+}
+
 module.exports = {
   llistar,
   obtenirPerId,
   crear,
   actualitzar,
   esborrar,
-  canviarEstat
+  canviarEstat,
+  canviarDisponibilitat,
+  anunciDestacat
 };

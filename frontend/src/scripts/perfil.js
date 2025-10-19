@@ -76,7 +76,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   btnEdit  && btnEdit.addEventListener('click', () => setMode(true));
   btnCancel&& btnCancel.addEventListener('click', () => { fill(user); if (inputs.contrassenya) inputs.contrassenya.value=''; setMode(false); });
 
-  // 4) Desa canvis (→ /perfil)
+  // 4) Desa canvis (/perfil)
   btnSave && btnSave.addEventListener('click', async () => {
     try {
       if (msg) msg.classList.add('hidden');
@@ -109,7 +109,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
   });
 
-  // 5) Esborrar compte (→ /perfil)
+  // 5) Esborrar compte (/perfil)
   btnDelete && btnDelete.addEventListener('click', async () => {
     if (!confirm('Segur que vols esborrar el compte? Aquesta acció és irreversible.')) return;
     try {
@@ -122,7 +122,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
   });
 
-  // 6) Els meus anuncis (→ /perfil/anuncis)
+  // 6) Els meus anuncis (/perfil/anuncis)
   try {
     const r = await fetch('http://localhost:3001/perfil/anuncis', { credentials:'include' });
     const l = r.ok ? await r.json() : [];
@@ -134,19 +134,94 @@ document.addEventListener('DOMContentLoaded', async () => {
         card.className = 'card-anunci';
         card.innerHTML = `
           <div class="card-img">
-            <img src="/uploads/cavall_prova.jpg" alt="Foto ${a.nom}">
+            <img src="http://localhost:3001/anuncis/${a.anunci_id}/portada" alt="Foto ${a.nom}">
             ${a.destacat ? '<span class="badge">🏅 Destacat</span>' : ''}
           </div>
           <div class="card-body">
+
             <h3>${a.nom}</h3>
-            <p class="sub">${a.raça || ''}</p>
+            <p class="sub">${a.raca || ''}</p>  <!-- IMPORTANT: raca (sense ç) -->
             <p class="price">${Number(a.preu).toFixed(2)} €</p>
             <div class="tags">${(a.disciplines||[]).map(d=>`<span class="tag">${d.nom}</span>`).join('')}</div>
-            <a class="btn-detail" href="/src/pages/detalls_anuncis.html?id=${a.anunci_id}">Ver más detalles</a>
+
+            <div class="ad-actions" style="display:flex; gap:.5rem; flex-wrap:wrap; margin-top:.5rem;">
+              <a class="btn-detail"   href="/src/pages/detalls_anuncis.html#id=${a.anunci_id}">Ver detalles</a>
+              
+              ${a.disponibilitat !== 'venut'? `
+                <a class="btn-primary" href="/src/pages/crear_anunci#id=${a.anunci_id}">Editar anuncio</a>
+                ` : ''
+              }
+
+              ${a.disponibilitat === 'actiu' ? `
+                <button class="btn-danger"  data-action="baixa" data-id="${a.anunci_id}">Dar de baja</button>
+                <button class="btn-primary" data-action="venut" data-id="${a.anunci_id}">Marcar como vendido</button>
+                ` : ''}
+              
+              <button class="btn-danger" data-action="delete" data-id="${a.anunci_id}">Eliminar anuncio</button>
+
+
+              ${a.disponibilitat === 'baixa' ? `
+                <button class="btn-secondary" data-action="actiu" data-id="${a.anunci_id}">Reactivar</button>
+                ` : ''}
+
+              ${a.disponibilitat === 'venut' ?
+                `<span class="muted">Vendido el</span> ${(new Date(a.venut_el)).toLocaleDateString()}</p>
+                ` : ''}
+            </div>
           </div>`;
+
         cont.appendChild(card);
       });
     }
+    // Accions de disponibilitat (PATCH /anuncis/:id/disponibilitat)
+    if (cont) cont.addEventListener('click', async (ev) => {
+      const btn = ev.target.closest('button[data-action]');
+      if (!btn) return;
+
+      const id  = btn.getAttribute('data-id');
+      const act = btn.getAttribute('data-action'); // 'baixa' | 'venut' | 'actiu' | 'delete'
+
+      // 1) Eliminar (primer, perquè no té 'disponibilitat')
+      if (act === 'delete') {
+        if (!confirm('¿Seguro que quiere eliminar este anuncio? Esta acción es irreversible.')) return;
+        try {
+          const r = await fetch(`http://localhost:3001/anuncis/${id}`, {
+            method: 'DELETE',
+            credentials: 'include'
+          });
+          if (!r.ok) throw new Error('No s\'ha pogut eliminar');
+          location.reload();
+        } catch (e) {
+          console.error(e);
+          alert('Error eliminant l\'anunci');
+        }
+        return;
+      }
+
+      // 2) Canvis de disponibilitat
+      const disponibilitat = { baixa:'baixa', venut:'venut', actiu:'actiu' }[act];
+      if (!disponibilitat) return; // acció desconeguda
+
+      if (act === 'baixa' && !confirm('Segur que vols donar de baixa l\'anunci?')) return;
+      if (act === 'venut' && !confirm('Marcar com venut?')) return;
+      if (act === 'actiu' && !confirm('Reactivar l\'anunci?')) return;
+
+      try {
+        const r = await fetch(`http://localhost:3001/anuncis/${id}/disponibilitat`, {
+          method: 'PATCH',
+          headers: { 'Content-Type':'application/json' },
+          credentials: 'include',
+          body: JSON.stringify({ disponibilitat })
+        });
+        if (!r.ok) throw new Error('No s\'ha pogut canviar la disponibilitat');
+        location.reload();
+      } catch (e) {
+        console.error(e);
+        alert('Error canviant la disponibilitat de l\'anunci');
+      }
+    });
+
+
   } catch (e) {
     console.error(e);
     const cont = $('#meus-anuncis');
